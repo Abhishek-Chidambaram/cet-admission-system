@@ -144,7 +144,7 @@ Visit `http://127.0.0.1:8000/` to access the application.
 |------|----------|-------|----------|
 | **Student** | `student1` | `student1@example.com` | `student123` |
 | **Admin** | `admin` | `admin@cet.edu` | `admin123` |
-| **Institution** | `rvce_admin` | `admin@rvce.edu` | `admin123` |
+| **Institution** | `pesu_admin` | `admin@pesu.edu` | `admin123` |
 
 ### 📱 **Student Workflow**
 1. **Register** → Complete profile → Upload documents
