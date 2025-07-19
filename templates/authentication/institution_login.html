@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Institution Login - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white text-center">
+                <h4><i class="fas fa-university"></i> Institution Login</h4>
+                <p class="mb-0">Institution management portal</p>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-sign-in-alt"></i> Login as Institution
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        Wrong login page? 
+                        <a href="{% url 'authentication:student_login' %}">Student Login</a> | 
+                        <a href="{% url 'authentication:admin_login' %}">Admin Login</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="text-success"><i class="fas fa-building"></i> For Institutions</h6>
+                <ul class="list-unstyled mb-0">
+                    <li><i class="fas fa-check text-success"></i> Manage course offerings</li>
+                    <li><i class="fas fa-check text-success"></i> View admitted students</li>
+                    <li><i class="fas fa-check text-success"></i> Track seat allocation</li>
+                    <li><i class="fas fa-check text-success"></i> Monitor occupancy rates</li>
+                    <li><i class="fas fa-check text-success"></i> Student contact information</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="alert alert-info mt-3">
+            <small>
+                <i class="fas fa-info-circle"></i>
+                <strong>Login with:</strong> Username or Email Address
+            </small>
+        </div>
+        
+        <div class="alert alert-success mt-3">
+            <small>
+                <i class="fas fa-university"></i>
+                <strong>Demo Credentials:</strong> rvce_admin / admin123, bmsce_admin / admin123, etc.
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}

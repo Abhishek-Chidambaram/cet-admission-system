@@ -1,0 +1,181 @@
+<!-- templates/home.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CET Admission System - Home{% endblock %}
+
+{% block content %}
+<div class="hero-section bg-primary text-white text-center py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <h1 class="display-4 mb-4">
+                    <i class="fas fa-graduation-cap"></i> 
+                    CET Admission System
+                </h1>
+                <p class="lead mb-4">
+                    Complete automation of Common Entrance Test admission process with advanced features
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{% url 'authentication:register' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-user-plus"></i> Register Now
+                    </a>
+                    <a href="{% url 'authentication:login' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <!-- Features Section -->
+    <div class="row mb-5">
+        <div class="col-md-12 text-center mb-4">
+            <h2>System Features</h2>
+            <p class="text-muted">Comprehensive CET admission management with automated processes</p>
+        </div>
+        
+        <!-- Free Features -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h4><i class="fas fa-check-circle"></i> Free Features</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success"></i> OTP-based Registration</li>
+                        <li><i class="fas fa-check text-success"></i> Profile Creation</li>
+                        <li><i class="fas fa-check text-success"></i> Document Upload</li>
+                        <li><i class="fas fa-check text-success"></i> Basic Counseling</li>
+                        <li><i class="fas fa-check text-success"></i> Rank Viewing</li>
+                        <li><i class="fas fa-check text-success"></i> Basic Notifications</li>
+                        <li><i class="fas fa-check text-success"></i> Hall Ticket Download</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Paid Features -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h4><i class="fas fa-star"></i> Premium Features</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-star text-warning"></i> Premium Counseling</li>
+                        <li><i class="fas fa-star text-warning"></i> Mock Allotment</li>
+                        <li><i class="fas fa-star text-warning"></i> Priority Support</li>
+                        <li><i class="fas fa-star text-warning"></i> Detailed Analytics</li>
+                        <li><i class="fas fa-star text-warning"></i> Multiple Payment Methods</li>
+                        <li><i class="fas fa-star text-warning"></i> Advanced Notifications</li>
+                        <li><i class="fas fa-star text-warning"></i> AI Document Verification</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'payment:plans' %}" class="btn btn-warning btn-block">
+                        <i class="fas fa-upgrade"></i> Upgrade to Premium
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Process Flow -->
+    <div class="row">
+        <div class="col-md-12 text-center mb-4">
+            <h2>CET Admission Process</h2>
+            <p class="text-muted">Step-by-step automated admission process</p>
+        </div>
+        
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-2 text-center">
+                    <div class="process-step">
+                        <div class="step-number">1</div>
+                        <i class="fas fa-user-plus fa-2x text-primary"></i>
+                        <h5>Register</h5>
+                        <p>OTP-based registration with email/SMS verification</p>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center">
+                    <div class="process-step">
+                        <div class="step-number">2</div>
+                        <i class="fas fa-file-alt fa-2x text-info"></i>
+                        <h5>Apply</h5>
+                        <p>Fill multi-step application form with validation</p>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center">
+                    <div class="process-step">
+                        <div class="step-number">3</div>
+                        <i class="fas fa-upload fa-2x text-success"></i>
+                        <h5>Upload</h5>
+                        <p>Submit required documents with AI verification</p>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center">
+                    <div class="process-step">
+                        <div class="step-number">4</div>
+                        <i class="fas fa-credit-card fa-2x text-warning"></i>
+                        <h5>Payment</h5>
+                        <p>Secure payment processing with multiple options</p>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center">
+                    <div class="process-step">
+                        <div class="step-number">5</div>
+                        <i class="fas fa-list-ol fa-2x text-danger"></i>
+                        <h5>Counseling</h5>
+                        <p>Drag-and-drop priority selection with mock allotment</p>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center">
+                    <div class="process-step">
+                        <div class="step-number">6</div>
+                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                        <h5>Admission</h5>
+                        <p>Seat allocation and admission confirmation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.process-step {
+    position: relative;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.step-number {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+</style>
+{% endblock %}

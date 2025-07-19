@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-tachometer-alt"></i> Student Dashboard</h2>
+        <p class="text-muted">Welcome, {{ user.get_full_name|default:user.username }}!</p>
+    </div>
+</div>
+
+{% if needs_profile %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-warning">
+            <h5><i class="fas fa-exclamation-triangle"></i> Complete Your Profile</h5>
+            <p>Please complete your student profile to continue with the admission process.</p>
+            <a href="{% url 'student:profile' %}" class="btn btn-warning">Complete Profile</a>
+        </div>
+    </div>
+</div>
+{% else %}
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-user fa-2x text-primary mb-2"></i>
+                <h6>Profile</h6>
+                <p class="text-muted">{{ student_profile.student_id }}</p>
+                <a href="{% url 'student:profile' %}" class="btn btn-sm btn-primary">View/Edit</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-file-alt fa-2x text-success mb-2"></i>
+                <h6>Application</h6>
+                {% if application %}
+                    <p class="text-muted">Status: <span class="badge bg-{{ application.status|yesno:'success,warning' }}">{{ application.get_status_display }}</span></p>
+                {% else %}
+                    <p class="text-muted">Not Started</p>
+                {% endif %}
+                <a href="{% url 'student:application' %}" class="btn btn-sm btn-success">Manage</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-upload fa-2x text-info mb-2"></i>
+                <h6>Documents</h6>
+                <p class="text-muted">{{ documents.count }} uploaded</p>
+                <a href="{% url 'student:documents' %}" class="btn btn-sm btn-info">Upload</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-chart-line fa-2x text-warning mb-2"></i>
+                <h6>CET Score</h6>
+                {% if cet_score %}
+                    <p class="text-muted">Rank: {{ cet_score.overall_rank }}</p>
+                {% else %}
+                    <p class="text-muted">Not Available</p>
+                {% endif %}
+                <a href="{% url 'student:scores' %}" class="btn btn-sm btn-warning">View</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if cet_score %}
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-trophy"></i> Your CET Performance</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <strong>Overall Rank:</strong> {{ cet_score.overall_rank }}
+                    </div>
+                    <div class="col-6">
+                        <strong>Total Score:</strong> {{ cet_score.total_score }}/540
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <strong>Percentile:</strong> {{ cet_score.percentile }}%
+                    </div>
+                    <div class="col-6">
+                        {% if cet_score.category_rank %}
+                            <strong>Category Rank:</strong> {{ cet_score.category_rank }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-university"></i> Counseling Status</h5>
+            </div>
+            <div class="card-body">
+                {% if allotments %}
+                    {% for allotment in allotments %}
+                        <div class="alert alert-success">
+                            <strong>Seat Allotted!</strong><br>
+                            Course: {{ allotment.allotted_course }}<br>
+                            Institution: {{ allotment.allotted_institution.name }}<br>
+                            {% if not allotment.is_accepted %}
+                                <a href="{% url 'student:accept_seat' allotment.id %}" class="btn btn-sm btn-success mt-2">Accept Seat</a>
+                            {% else %}
+                                <span class="badge bg-success">Seat Accepted</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No seat allotment yet. Counseling rounds will begin soon.</p>
+                    <a href="{% url 'student:counseling' %}" class="btn btn-sm btn-primary">View Counseling Info</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endif %}
+{% endblock %}

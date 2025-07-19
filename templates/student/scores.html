@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}CET Scores - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-chart-line"></i> CET Scores & Rank</h2>
+        <p class="text-muted">Your CET examination performance</p>
+    </div>
+</div>
+
+{% if cet_score %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-trophy"></i> Your Performance</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h3 class="text-primary">{{ cet_score.overall_rank }}</h3>
+                        <p class="text-muted">Overall Rank</p>
+                    </div>
+                    <div class="col-6">
+                        <h3 class="text-success">{{ cet_score.total_score }}</h3>
+                        <p class="text-muted">Total Score / 540</p>
+                    </div>
+                </div>
+                <div class="row text-center mt-3">
+                    <div class="col-6">
+                        <h4 class="text-info">{{ cet_score.percentile }}%</h4>
+                        <p class="text-muted">Percentile</p>
+                    </div>
+                    <div class="col-6">
+                        {% if cet_score.category_rank %}
+                            <h4 class="text-warning">{{ cet_score.category_rank }}</h4>
+                            <p class="text-muted">Category Rank</p>
+                        {% else %}
+                            <h4 class="text-muted">-</h4>
+                            <p class="text-muted">Category Rank</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-chart-bar"></i> Subject-wise Scores</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Physics</span>
+                        <span><strong>{{ cet_score.physics_score }}/180</strong></span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" style="width: {% widthratio cet_score.physics_score 180 100 %}%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Chemistry</span>
+                        <span><strong>{{ cet_score.chemistry_score }}/180</strong></span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: {% widthratio cet_score.chemistry_score 180 100 %}%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Mathematics</span>
+                        <span><strong>{{ cet_score.mathematics_score }}/180</strong></span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" style="width: {% widthratio cet_score.mathematics_score 180 100 %}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Exam Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Hall Ticket Number:</strong><br>
+                        {{ cet_score.hall_ticket_number }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Exam Date:</strong><br>
+                        {{ cet_score.exam_date|date:"M d, Y" }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Exam Center:</strong><br>
+                        {{ cet_score.exam_center }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Result Date:</strong><br>
+                        {{ cet_score.created_at|date:"M d, Y" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-chart-line fa-4x text-muted mb-4"></i>
+                <h4 class="text-muted">CET Scores Not Available</h4>
+                <p class="text-muted">Your CET examination scores will be displayed here once the results are published.</p>
+                <div class="alert alert-info mt-4">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Note:</strong> This is a mock system. Scores are generated randomly for demonstration purposes.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'student:dashboard' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

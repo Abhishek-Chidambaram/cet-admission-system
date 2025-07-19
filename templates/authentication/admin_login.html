@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Admin Login - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark text-center">
+                <h4><i class="fas fa-cogs"></i> Administrator Login</h4>
+                <p class="mb-0">System administration portal</p>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-warning btn-lg text-dark">
+                            <i class="fas fa-sign-in-alt"></i> Login as Administrator
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        Wrong login page? 
+                        <a href="{% url 'authentication:student_login' %}">Student Login</a> | 
+                        <a href="{% url 'authentication:institution_login' %}">Institution Login</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="text-warning"><i class="fas fa-shield-alt"></i> Administrator Access</h6>
+                <ul class="list-unstyled mb-0">
+                    <li><i class="fas fa-check text-success"></i> Manage student applications</li>
+                    <li><i class="fas fa-check text-success"></i> Generate CET scores</li>
+                    <li><i class="fas fa-check text-success"></i> Run counseling rounds</li>
+                    <li><i class="fas fa-check text-success"></i> Monitor institutions</li>
+                    <li><i class="fas fa-check text-success"></i> System reports and analytics</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="alert alert-info mt-3">
+            <small>
+                <i class="fas fa-info-circle"></i>
+                <strong>Login with:</strong> Username or Email Address
+            </small>
+        </div>
+        
+        <div class="alert alert-warning mt-3">
+            <small>
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Demo Credentials:</strong> admin / admin123
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}

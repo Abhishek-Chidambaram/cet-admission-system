@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Counseling - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-users"></i> Counseling Process</h2>
+        <p class="text-muted">Track your counseling rounds and seat allocation</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        {% if allotments %}
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-check-circle"></i> Seat Allotment Results</h5>
+                </div>
+                <div class="card-body">
+                    {% for allotment in allotments %}
+                        <div class="alert alert-success">
+                            <h6><i class="fas fa-graduation-cap"></i> Round {{ allotment.counseling_round.round_number }} - {{ allotment.counseling_round.round_name }}</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Course:</strong> {{ allotment.allotted_course }}<br>
+                                    <strong>Institution:</strong> {{ allotment.allotted_institution.name }}<br>
+                                    <strong>Category:</strong> {{ allotment.allotment_category }}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Allotment Date:</strong> {{ allotment.created_at|date:"M d, Y" }}<br>
+                                    <strong>Status:</strong> 
+                                    {% if allotment.is_accepted %}
+                                        <span class="badge bg-success">Accepted</span><br>
+                                        <small class="text-muted">Accepted on {{ allotment.acceptance_date|date:"M d, Y H:i" }}</small>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pending Acceptance</span><br>
+                                        <a href="{% url 'student:accept_seat' allotment.id %}" class="btn btn-sm btn-success mt-2">
+                                            <i class="fas fa-check"></i> Accept Seat
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-hourglass-half fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">Counseling Not Started</h4>
+                    <p class="text-muted">Your seat allotment results will appear here once counseling rounds begin.</p>
+                    
+                    <div class="alert alert-info mt-4">
+                        <h6><i class="fas fa-info-circle"></i> What happens next?</h6>
+                        <ul class="list-unstyled text-start">
+                            <li>1. Complete your profile and upload documents</li>
+                            <li>2. Submit your application with course preferences</li>
+                            <li>3. Wait for counseling rounds to begin</li>
+                            <li>4. Check your seat allotment results</li>
+                            <li>5. Accept your allotted seat if satisfied</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-calendar-alt"></i> Counseling Schedule</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h6>Round 1 - First Round</h6>
+                            <small class="text-muted">Aug 1-7, 2024</small>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-secondary"></div>
+                        <div class="timeline-content">
+                            <h6>Round 2 - Second Round</h6>
+                            <small class="text-muted">Aug 15-21, 2024</small>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-secondary"></div>
+                        <div class="timeline-content">
+                            <h6>Round 3 - Mop-up Round</h6>
+                            <small class="text-muted">Aug 25-28, 2024</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if student_profile.cet_score %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-trophy"></i> Your Eligibility</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Overall Rank:</strong> {{ student_profile.cet_score.overall_rank }}</p>
+                <p><strong>Category:</strong> {{ student_profile.category }}</p>
+                {% if student_profile.cet_score.category_rank %}
+                    <p><strong>Category Rank:</strong> {{ student_profile.cet_score.category_rank }}</p>
+                {% endif %}
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> You are eligible for counseling!
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'student:dashboard' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -35px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: -30px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+}
+</style>
+{% endblock %}

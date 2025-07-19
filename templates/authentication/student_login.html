@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Student Login - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white text-center">
+                <h4><i class="fas fa-user-graduate"></i> Student Login</h4>
+                <p class="mb-0">Access your student dashboard</p>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt"></i> Login as Student
+                        </button>
+                    </div>
+                </form>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <p class="text-muted">Don't have a student account?</p>
+                    <a href="{% url 'authentication:register' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-user-plus"></i> Register as Student
+                    </a>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <small>
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Login with:</strong> Username or Email Address
+                    </small>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        Wrong login page? 
+                        <a href="{% url 'authentication:admin_login' %}">Admin Login</a> | 
+                        <a href="{% url 'authentication:institution_login' %}">Institution Login</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="text-primary"><i class="fas fa-info-circle"></i> For Students</h6>
+                <ul class="list-unstyled mb-0">
+                    <li><i class="fas fa-check text-success"></i> Complete your profile</li>
+                    <li><i class="fas fa-check text-success"></i> Apply for engineering courses</li>
+                    <li><i class="fas fa-check text-success"></i> Upload documents</li>
+                    <li><i class="fas fa-check text-success"></i> View CET scores and ranks</li>
+                    <li><i class="fas fa-check text-success"></i> Track counseling and seat allotment</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

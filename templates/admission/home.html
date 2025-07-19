@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="jumbotron bg-primary text-white p-5 rounded mb-4">
+            <h1 class="display-4">Karnataka CET Admission System</h1>
+            <p class="lead">Common Entrance Test for Engineering Admissions</p>
+            <hr class="my-4">
+            <p>Apply for engineering courses across Karnataka's top institutions</p>
+            {% if not user.is_authenticated %}
+                <a class="btn btn-light btn-lg me-2" href="{% url 'authentication:login_selection' %}" role="button">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a class="btn btn-outline-light btn-lg" href="{% url 'authentication:register' %}" role="button">
+                    <i class="fas fa-user-plus"></i> Register Now
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-user-graduate fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">For Students</h5>
+                <p class="card-text">Register, apply for courses, upload documents, and track your admission status.</p>
+                {% if user.is_authenticated and user.user_type == 'student' %}
+                    <a href="{% url 'student:dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
+                {% else %}
+                    <a href="{% url 'authentication:student_login' %}" class="btn btn-primary">Student Login</a>
+                    <a href="{% url 'authentication:register' %}" class="btn btn-outline-primary">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-university fa-3x text-success mb-3"></i>
+                <h5 class="card-title">For Institutions</h5>
+                <p class="card-text">Manage courses, view admitted students, and track seat allocation.</p>
+                {% if user.is_authenticated and user.user_type == 'institution' %}
+                    <a href="{% url 'institution:dashboard' %}" class="btn btn-success">Go to Dashboard</a>
+                {% else %}
+                    <a href="{% url 'authentication:institution_login' %}" class="btn btn-success">Institution Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-cogs fa-3x text-warning mb-3"></i>
+                <h5 class="card-title">For Administrators</h5>
+                <p class="card-text">Manage the entire admission process, counseling rounds, and system settings.</p>
+                {% if user.is_authenticated and user.user_type == 'admin' %}
+                    <a href="{% url 'admission:admin_dashboard' %}" class="btn btn-warning">Go to Dashboard</a>
+                {% else %}
+                    <a href="{% url 'authentication:admin_login' %}" class="btn btn-warning">Admin Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <h3>Available Engineering Courses</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="list-group">
+                    <li class="list-group-item">Computer Science Engineering (CSE)</li>
+                    <li class="list-group-item">Information Science Engineering (ISE)</li>
+                    <li class="list-group-item">Electronics and Communication Engineering (ECE)</li>
+                    <li class="list-group-item">Electrical and Electronics Engineering (EEE)</li>
+                    <li class="list-group-item">Mechanical Engineering (MECH)</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="list-group">
+                    <li class="list-group-item">Civil Engineering (CIVIL)</li>
+                    <li class="list-group-item">Biotechnology (BIOTECH)</li>
+                    <li class="list-group-item">Chemical Engineering (CHEM)</li>
+                    <li class="list-group-item">Aeronautical Engineering (AERO)</li>
+                    <li class="list-group-item">Automobile Engineering (AUTO)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h5><i class="fas fa-info-circle"></i> Important Notice</h5>
+            <p class="mb-0">This is a mock CET admission system created for educational purposes. All features including payments, notifications, and AI verification are simulated.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

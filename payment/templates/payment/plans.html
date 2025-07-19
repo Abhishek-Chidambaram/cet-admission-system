@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Premium Plans - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3">Choose Your Plan</h1>
+                <p class="lead text-muted">Upgrade to unlock premium features and enhance your admission experience</p>
+            </div>
+            
+            <div class="row">
+                {% for plan in plans %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 {% if plan.disabled %}border-secondary{% else %}border-warning{% endif %}">
+                        <div class="card-header {% if plan.disabled %}bg-secondary{% else %}bg-warning{% endif %} text-white text-center py-3">
+                            <h3 class="my-0">{{ plan.name }}</h3>
+                        </div>
+                        <div class="card-body text-center">
+                            <h2 class="card-title pricing-card-title">
+                                ₹{{ plan.price }}<small class="text-muted">/ one-time</small>
+                            </h2>
+                            <ul class="list-unstyled mt-3 mb-4">
+                                {% for feature in plan.features %}
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success"></i> {{ feature }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="card-footer bg-white text-center">
+                            <button type="button" class="btn btn-lg btn-block {{ plan.button_class }}" {% if plan.disabled %}disabled{% endif %}>
+                                {{ plan.button_text }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="text-center mt-5">
+                <h3 class="mb-4">Why Choose Premium?</h3>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="feature-box p-4 h-100">
+                            <div class="feature-icon mb-3 text-primary">
+                                <i class="fas fa-user-shield fa-3x"></i>
+                            </div>
+                            <h4>Priority Support</h4>
+                            <p class="text-muted">Get your queries resolved faster with dedicated support.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="feature-box p-4 h-100">
+                            <div class="feature-icon mb-3 text-success">
+                                <i class="fas fa-chart-line fa-3x"></i>
+                            </div>
+                            <h4>Advanced Analytics</h4>
+                            <p class="text-muted">Get detailed insights and predictions for better decision making.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="feature-box p-4 h-100">
+                            <div class="feature-icon mb-3 text-info">
+                                <i class="fas fa-robot fa-3x"></i>
+                            </div>
+                            <h4>AI Assistance</h4>
+                            <p class="text-muted">Smart document verification and application assistance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h4 class="card-title">Frequently Asked Questions</h4>
+                    <div class="accordion" id="faqAccordion">
+                        <div class="card">
+                            <div class="card-header" id="faqOne">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                        What payment methods do you accept?
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseOne" class="collapse show" data-bs-parent="#faqAccordion">
+                                <div class="card-body">
+                                    We accept all major credit/debit cards, UPI, Net Banking, and popular digital wallets.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header" id="faqTwo">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                        Is there a refund policy?
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseTwo" class="collapse" data-bs-parent="#faqAccordion">
+                                <div class="card-body">
+                                    Yes, we offer a 30-day money-back guarantee if you're not satisfied with our premium services.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header" id="faqThree">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                        Can I upgrade later?
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseThree" class="collapse" data-bs-parent="#faqAccordion">
+                                <div class="card-body">
+                                    Absolutely! You can upgrade to a premium plan at any time from your dashboard.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.feature-box {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.feature-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.pricing-card-title {
+    font-size: 2.5rem;
+    margin: 1rem 0;
+}
+
+.card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,.125);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+</style>
+{% endblock %}

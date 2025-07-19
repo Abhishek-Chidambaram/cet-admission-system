@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Institution Dashboard - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-university"></i> Institution Dashboard</h2>
+        {% if institution %}
+            <p class="text-muted">Welcome to {{ institution.name }}</p>
+        {% else %}
+            <p class="text-muted">Institution Management Portal</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if no_institution %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-warning">
+            <h5><i class="fas fa-exclamation-triangle"></i> No Institution Found</h5>
+            <p>Your account is not associated with any institution. Please contact the administrator.</p>
+        </div>
+    </div>
+</div>
+{% else %}
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-center bg-primary text-white">
+            <div class="card-body">
+                <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+                <h3>{{ total_courses }}</h3>
+                <p>Total Courses</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center bg-success text-white">
+            <div class="card-body">
+                <i class="fas fa-chair fa-2x mb-2"></i>
+                <h3>{{ total_seats }}</h3>
+                <p>Total Seats</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center bg-info text-white">
+            <div class="card-body">
+                <i class="fas fa-users fa-2x mb-2"></i>
+                <h3>{{ admitted_students }}</h3>
+                <p>Admitted Students</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center bg-warning text-white">
+            <div class="card-body">
+                <i class="fas fa-percentage fa-2x mb-2"></i>
+                <h3>{% if total_seats > 0 %}{% widthratio admitted_students total_seats 100 %}{% else %}0{% endif %}%</h3>
+                <p>Occupancy Rate</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-clock"></i> Recent Admissions</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_admissions %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Course</th>
+                                    <th>Category</th>
+                                    <th>Admission Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for admission in recent_admissions %}
+                                <tr>
+                                    <td>{{ admission.student.user.get_full_name }}</td>
+                                    <td>{{ admission.allotted_course }}</td>
+                                    <td><span class="badge bg-secondary">{{ admission.allotment_category }}</span></td>
+                                    <td>{{ admission.acceptance_date|date:"M d, Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No recent admissions.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Institution Info</h5>
+            </div>
+            <div class="card-body">
+                {% if institution %}
+                    <p><strong>Code:</strong> {{ institution.code }}</p>
+                    <p><strong>Type:</strong> {{ institution.get_institution_type_display }}</p>
+                    <p><strong>City:</strong> {{ institution.city }}</p>
+                    <p><strong>Established:</strong> {{ institution.established_year }}</p>
+                    <p><strong>Phone:</strong> {{ institution.phone }}</p>
+                    <p><strong>Email:</strong> {{ institution.email }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-tools"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'institution:courses' %}" class="btn btn-primary">
+                        <i class="fas fa-graduation-cap"></i> Manage Courses
+                    </a>
+                    <a href="{% url 'institution:students' %}" class="btn btn-success">
+                        <i class="fas fa-users"></i> View Students
+                    </a>
+                    <a href="{% url 'institution:seat_matrix' %}" class="btn btn-info">
+                        <i class="fas fa-chart-bar"></i> Seat Matrix
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}

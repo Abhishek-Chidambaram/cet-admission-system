@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-cogs"></i> Admin Dashboard</h2>
+        <p class="text-muted">Manage the CET admission system</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-center bg-primary text-white">
+            <div class="card-body">
+                <i class="fas fa-users fa-2x mb-2"></i>
+                <h3>{{ total_students }}</h3>
+                <p>Total Students</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center bg-success text-white">
+            <div class="card-body">
+                <i class="fas fa-file-alt fa-2x mb-2"></i>
+                <h3>{{ total_applications }}</h3>
+                <p>Applications</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center bg-info text-white">
+            <div class="card-body">
+                <i class="fas fa-university fa-2x mb-2"></i>
+                <h3>{{ total_institutions }}</h3>
+                <p>Institutions</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center bg-warning text-white">
+            <div class="card-body">
+                <i class="fas fa-check fa-2x mb-2"></i>
+                <h3>{{ verified_applications }}</h3>
+                <p>Verified Apps</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-tools"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <form method="post" action="{% url 'admission:generate_scores' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-random"></i> Generate Mock CET Scores
+                        </button>
+                    </form>
+                    
+                    <form method="post" action="{% url 'admission:run_counseling' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-block">
+                            <i class="fas fa-play"></i> Run Counseling Round
+                        </button>
+                    </form>
+                    
+                    <a href="{% url 'admission:student_list' %}" class="btn btn-info">
+                        <i class="fas fa-list"></i> View All Students
+                    </a>
+                    
+                    <a href="{% url 'admission:institution_list' %}" class="btn btn-warning">
+                        <i class="fas fa-building"></i> View All Institutions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-clock"></i> Recent Applications</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_applications %}
+                    <div class="list-group list-group-flush">
+                        {% for app in recent_applications %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ app.student.user.get_full_name }}</strong><br>
+                                    <small class="text-muted">{{ app.application_number }}</small>
+                                </div>
+                                <span class="badge bg-{{ app.status|yesno:'success,warning' }}">{{ app.get_status_display }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No applications yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h5><i class="fas fa-info-circle"></i> System Information</h5>
+            <p>This is a mock CET admission system. All data and processes are simulated for educational purposes.</p>
+            <ul>
+                <li><strong>Mock Features:</strong> AI document verification, payment processing, SMS/Email notifications</li>
+                <li><strong>Data Generation:</strong> CET scores and ranks are randomly generated</li>
+                <li><strong>Counseling:</strong> Seat allocation is done through mock algorithms</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

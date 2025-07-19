@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Courses - Institution Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-graduation-cap"></i> Course Management</h2>
+        <p class="text-muted">Manage courses offered by your institution</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-list"></i> Available Courses</h5>
+            </div>
+            <div class="card-body">
+                {% if courses %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Course Code</th>
+                                    <th>Course Name</th>
+                                    <th>Total Seats</th>
+                                    <th>General</th>
+                                    <th>OBC</th>
+                                    <th>SC</th>
+                                    <th>ST</th>
+                                    <th>EWS</th>
+                                    <th>Fees/Year</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in courses %}
+                                <tr>
+                                    <td><strong>{{ course.course_code }}</strong></td>
+                                    <td>{{ course.course_name }}</td>
+                                    <td>{{ course.total_seats }}</td>
+                                    <td>{{ course.general_seats }}</td>
+                                    <td>{{ course.obc_seats }}</td>
+                                    <td>{{ course.sc_seats }}</td>
+                                    <td>{{ course.st_seats }}</td>
+                                    <td>{{ course.ews_seats }}</td>
+                                    <td>₹{{ course.fees_per_year|floatformat:0 }}</td>
+                                    <td>
+                                        {% if course.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No courses available.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'institution:dashboard' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

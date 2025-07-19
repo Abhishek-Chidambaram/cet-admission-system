@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verify OTP - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg mt-5">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3><i class="fas fa-shield-alt"></i> Verify OTP</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="alert alert-info">
+                        <p class="mb-0">
+                            <i class="fas fa-info-circle"></i> 
+                            We've sent a verification code to your registered email and phone number. 
+                            Please enter the OTP below to verify your account.
+                        </p>
+                        <p class="mb-0 mt-2">
+                            <strong>Note:</strong> For development, check your console for the OTP.
+                        </p>
+                    </div>
+
+                    <form method="post" action="{% url 'authentication:verify_otp' %}" class="mt-4">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4 text-center">
+                            <label for="otp" class="form-label">Enter 6-digit OTP</label>
+                            <div class="otp-input-group d-flex justify-content-center gap-2">
+                                <input type="text" class="form-control form-control-lg text-center otp-input" 
+                                       id="otp" name="otp" maxlength="6" pattern="\d{6}" 
+                                       placeholder="------" required autofocus>
+                            </div>
+                            <div class="form-text">Check your email/phone for the OTP code</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check-circle"></i> Verify OTP
+                            </button>
+                            <button type="button" id="resend-otp" class="btn btn-outline-secondary">
+                                <i class="fas fa-redo"></i> Resend OTP
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <p class="mb-0">
+                        Didn't receive the OTP? 
+                        <a href="#" id="resend-otp-link">Resend OTP</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.otp-input {
+    font-size: 1.5rem;
+    letter-spacing: 0.5rem;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.otp-input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1.5rem;
+    border-bottom: none;
+}
+
+.alert {
+    border-radius: 10px;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+}
+</style>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus OTP input
+    const otpInput = document.getElementById('otp');
+    if (otpInput) {
+        otpInput.focus();
+    }
+
+    // Handle OTP input formatting
+    if (otpInput) {
+        otpInput.addEventListener('input', function(e) {
+            // Remove any non-digit characters
+            this.value = this.value.replace(/\D/g, '');
+            
+            // Limit to 6 digits
+            if (this.value.length > 6) {
+                this.value = this.value.slice(0, 6);
+            }
+        });
+    }
+
+    // Handle resend OTP
+    const resendButtons = document.querySelectorAll('#resend-otp, #resend-otp-link');
+    resendButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            const originalText = this.innerHTML;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
+            this.disabled = true;
+            
+            // Send AJAX request to resend OTP
+            fetch('{% url "authentication:resend_otp" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: 'otp_type=registration'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                    alertDiv.role = 'alert';
+                    alertDiv.innerHTML = `
+                        <i class="fas fa-check-circle"></i> New OTP has been sent to your email and phone.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    
+                    const cardBody = document.querySelector('.card-body');
+                    if (cardBody) {
+                        cardBody.insertBefore(alertDiv, cardBody.firstChild);
+                    }
+                    
+                    // Scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    throw new Error(data.message || 'Failed to resend OTP');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to resend OTP. Please try again.');
+            })
+            .finally(() => {
+                // Restore button
+                this.innerHTML = originalText;
+                this.disabled = false;
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}
+
+<!-- This template provides a clean, responsive OTP verification interface with the following features:
+1. Clean, modern UI with card layout
+2. Responsive design that works on all devices
+3. OTP input with auto-formatting
+4. Resend OTP functionality
+5. Helpful instructions for development (shows where to find the OTP)
+6. Client-side validation
+7. Loading states for better UX
+8. Error handling and user feedback
+9. Auto-focus on OTP input for better UX
+10. Consistent styling with the rest of the application
+-->

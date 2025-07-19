@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Run Counseling - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-play"></i> Run Counseling Round</h2>
+        <p class="text-muted">Execute seat allocation for counseling rounds</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-users"></i> Counseling Process</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Important</h6>
+                    <p>Running counseling will:</p>
+                    <ul>
+                        <li>Create counseling rounds if they don't exist</li>
+                        <li>Allocate seats to eligible students based on rank</li>
+                        <li>Update application status to 'allotted'</li>
+                        <li>Send mock notifications to students</li>
+                    </ul>
+                    <p class="mb-0"><strong>This action cannot be undone.</strong></p>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg" onclick="return confirm('Are you sure you want to run the counseling round? This will allocate seats to students.')">
+                            <i class="fas fa-play"></i> Run Counseling Round 1
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Counseling Info</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Allocation Criteria:</strong></p>
+                <ul class="list-unstyled">
+                    <li>• Merit-based (CET rank)</li>
+                    <li>• Course preferences</li>
+                    <li>• Category reservations</li>
+                    <li>• Seat availability</li>
+                </ul>
+                
+                <hr>
+                
+                <p><strong>Process:</strong></p>
+                <ol class="list-unstyled">
+                    <li>1. Sort students by rank</li>
+                    <li>2. Check course preferences</li>
+                    <li>3. Allocate available seats</li>
+                    <li>4. Update student status</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'admission:admin_dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

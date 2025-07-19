@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Students - Institution Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-users"></i> Admitted Students</h2>
+        <p class="text-muted">Students who have accepted seats at your institution</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-list"></i> Student List</h5>
+                <span class="badge bg-primary">{{ allotments|length }} students</span>
+            </div>
+            <div class="card-body">
+                {% if allotments %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Name</th>
+                                    <th>Course</th>
+                                    <th>Category</th>
+                                    <th>Round</th>
+                                    <th>Admission Date</th>
+                                    <th>Contact</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for allotment in allotments %}
+                                <tr>
+                                    <td><strong>{{ allotment.student.student_id }}</strong></td>
+                                    <td>{{ allotment.student.user.get_full_name }}</td>
+                                    <td>{{ allotment.allotted_course }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ allotment.allotment_category }}</span>
+                                    </td>
+                                    <td>{{ allotment.counseling_round.round_name }}</td>
+                                    <td>{{ allotment.acceptance_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <small>
+                                            {{ allotment.student.user.email }}<br>
+                                            {{ allotment.student.parent_phone }}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if is_paginated %}
+                        <nav aria-label="Students pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">&laquo; First</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No students have been admitted yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'institution:dashboard' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}Seat Allotment - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-university"></i> Seat Allotment</h2>
+        <p class="text-muted">Your seat allocation results</p>
+    </div>
+</div>
+
+{% if latest_allotment %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-trophy"></i> Congratulations! Seat Allotted</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Course Details</h6>
+                        <p><strong>Course:</strong> {{ latest_allotment.allotted_course }}</p>
+                        <p><strong>Institution:</strong> {{ latest_allotment.allotted_institution.name }}</p>
+                        <p><strong>Institution Code:</strong> {{ latest_allotment.allotted_institution.code }}</p>
+                        <p><strong>Location:</strong> {{ latest_allotment.allotted_institution.city }}, {{ latest_allotment.allotted_institution.state }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Allotment Details</h6>
+                        <p><strong>Round:</strong> {{ latest_allotment.counseling_round.round_name }}</p>
+                        <p><strong>Category:</strong> {{ latest_allotment.allotment_category }}</p>
+                        <p><strong>Allotment Date:</strong> {{ latest_allotment.created_at|date:"M d, Y" }}</p>
+                        <p><strong>Status:</strong> 
+                            {% if latest_allotment.is_accepted %}
+                                <span class="badge bg-success">Accepted</span>
+                            {% else %}
+                                <span class="badge bg-warning">Pending Acceptance</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                {% if not latest_allotment.is_accepted %}
+                <div class="alert alert-warning mt-3">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Action Required</h6>
+                    <p>You have been allotted a seat. Please accept or reject this allotment within the specified time limit.</p>
+                    <form method="post" action="{% url 'student:accept_seat' latest_allotment.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success me-2" onclick="return confirm('Are you sure you want to accept this seat? This action cannot be undone.')">
+                            <i class="fas fa-check"></i> Accept Seat
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-outline-danger" disabled>
+                        <i class="fas fa-times"></i> Reject Seat (Not Available)
+                    </button>
+                </div>
+                {% else %}
+                <div class="alert alert-success mt-3">
+                    <h6><i class="fas fa-check-circle"></i> Seat Accepted</h6>
+                    <p>You have successfully accepted this seat on {{ latest_allotment.acceptance_date|date:"M d, Y H:i" }}.</p>
+                    <p><strong>Next Steps:</strong></p>
+                    <ul>
+                        <li>Report to the institution for document verification</li>
+                        <li>Complete the admission formalities</li>
+                        <li>Pay the required fees</li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Institution Contact</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Address:</strong><br>{{ latest_allotment.allotted_institution.address }}</p>
+                <p><strong>Phone:</strong> {{ latest_allotment.allotted_institution.phone }}</p>
+                <p><strong>Email:</strong> {{ latest_allotment.allotted_institution.email }}</p>
+                {% if latest_allotment.allotted_institution.website %}
+                    <p><strong>Website:</strong> 
+                        <a href="{{ latest_allotment.allotted_institution.website }}" target="_blank">
+                            Visit Website <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-calendar-check"></i> Important Dates</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Counseling Round:</strong> {{ latest_allotment.counseling_round.start_date|date:"M d" }} - {{ latest_allotment.counseling_round.end_date|date:"M d, Y" }}</p>
+                <p><strong>Allotment Date:</strong> {{ latest_allotment.created_at|date:"M d, Y" }}</p>
+                {% if latest_allotment.is_accepted %}
+                    <p><strong>Acceptance Date:</strong> {{ latest_allotment.acceptance_date|date:"M d, Y" }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if allotments.count > 1 %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-history"></i> Previous Allotments</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Round</th>
+                                <th>Course</th>
+                                <th>Institution</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for allotment in allotments %}
+                                {% if allotment != latest_allotment %}
+                                <tr>
+                                    <td>{{ allotment.counseling_round.round_name }}</td>
+                                    <td>{{ allotment.allotted_course }}</td>
+                                    <td>{{ allotment.allotted_institution.name }}</td>
+                                    <td>{{ allotment.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if allotment.is_accepted %}
+                                            <span class="badge bg-success">Accepted</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Not Accepted</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-university fa-4x text-muted mb-4"></i>
+                <h4 class="text-muted">No Seat Allotment Yet</h4>
+                <p class="text-muted">Your seat allotment results will appear here after counseling rounds.</p>
+                
+                <div class="alert alert-info mt-4">
+                    <h6><i class="fas fa-info-circle"></i> What to do while waiting?</h6>
+                    <ul class="list-unstyled">
+                        <li>✓ Ensure your profile is complete</li>
+                        <li>✓ Upload all required documents</li>
+                        <li>✓ Submit your application with course preferences</li>
+                        <li>✓ Keep checking for counseling updates</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'student:dashboard' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <a href="{% url 'student:counseling' %}" class="btn btn-outline-primary">
+            <i class="fas fa-users"></i> View Counseling Info
+        </a>
+    </div>
+</div>
+{% endblock %}

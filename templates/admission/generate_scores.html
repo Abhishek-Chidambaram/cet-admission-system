@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Generate Scores - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-random"></i> Generate CET Scores</h2>
+        <p class="text-muted">Generate mock CET scores for students</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-cogs"></i> Score Generation</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle"></i> About Score Generation</h6>
+                    <p>This tool generates realistic mock CET scores for students who don't have them yet. The scores are generated using:</p>
+                    <ul>
+                        <li>Random but realistic score distribution</li>
+                        <li>Subject-wise scores (Physics, Chemistry, Mathematics)</li>
+                        <li>Overall and category-wise ranks</li>
+                        <li>Percentile calculations</li>
+                    </ul>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-random"></i> Generate Scores for All Students
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-line"></i> Score Distribution</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Score Range:</strong> 0 - 540</p>
+                <p><strong>Physics:</strong> 0 - 180</p>
+                <p><strong>Chemistry:</strong> 0 - 180</p>
+                <p><strong>Mathematics:</strong> 0 - 180</p>
+                
+                <hr>
+                
+                <p><strong>Rank Calculation:</strong></p>
+                <ul class="list-unstyled">
+                    <li>• Higher score = Better rank</li>
+                    <li>• Category-wise ranks for reserved categories</li>
+                    <li>• Realistic rank distribution</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'admission:admin_dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Student Profile - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-user"></i> Student Profile</h2>
+        <p class="text-muted">Complete your profile information for the admission process</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-edit"></i> Profile Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Personal Information</h6>
+                            {{ form.date_of_birth|as_crispy_field }}
+                            {{ form.gender|as_crispy_field }}
+                            {{ form.category|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Contact Information</h6>
+                            {{ form.address|as_crispy_field }}
+                            {{ form.city|as_crispy_field }}
+                            {{ form.state|as_crispy_field }}
+                            {{ form.pincode|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Parent Information</h6>
+                            {{ form.father_name|as_crispy_field }}
+                            {{ form.mother_name|as_crispy_field }}
+                            {{ form.parent_phone|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Academic Information</h6>
+                            {{ form.school_name|as_crispy_field }}
+                            {{ form.board|as_crispy_field }}
+                            {{ form.photo|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'student:dashboard' %}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Profile Guidelines</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Fill all required fields</li>
+                    <li><i class="fas fa-check text-success"></i> Upload a clear passport-size photo</li>
+                    <li><i class="fas fa-check text-success"></i> Ensure all information is accurate</li>
+                    <li><i class="fas fa-check text-success"></i> Double-check contact details</li>
+                </ul>
+                
+                <div class="alert alert-info mt-3">
+                    <small>
+                        <i class="fas fa-lightbulb"></i>
+                        <strong>Tip:</strong> Complete your profile to proceed with the application process.
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        {% if object.student_id %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-id-card"></i> Student Details</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Student ID:</strong> {{ object.student_id }}</p>
+                <p><strong>Registration Date:</strong> {{ object.created_at|date:"M d, Y" }}</p>
+                {% if object.photo %}
+                    <p><strong>Photo:</strong></p>
+                    <img src="{{ object.photo.url }}" alt="Student Photo" class="img-thumbnail" style="max-width: 150px;">
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

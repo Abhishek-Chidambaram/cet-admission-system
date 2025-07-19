@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}CET Results - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-trophy"></i> CET 2024 Results</h2>
+        <p class="text-muted">Karnataka Common Entrance Test Results</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-medal"></i> Top Performers</h5>
+            </div>
+            <div class="card-body">
+                {% if top_rankers %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Student ID</th>
+                                    <th>Name</th>
+                                    <th>Total Score</th>
+                                    <th>Percentile</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for score in top_rankers %}
+                                <tr>
+                                    <td>
+                                        <strong class="text-primary">#{{ score.overall_rank }}</strong>
+                                        {% if score.overall_rank == 1 %}
+                                            <i class="fas fa-crown text-warning"></i>
+                                        {% elif score.overall_rank <= 3 %}
+                                            <i class="fas fa-medal text-warning"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ score.student.student_id }}</td>
+                                    <td>{{ score.student.user.get_full_name }}</td>
+                                    <td><strong>{{ score.total_score }}/540</strong></td>
+                                    <td>{{ score.percentile }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-trophy fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No results available yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar"></i> Exam Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <h3 class="text-primary">{{ total_students }}</h3>
+                    <p class="text-muted">Total Students Appeared</p>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Exam Date:</span>
+                        <strong>May 15, 2024</strong>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Result Date:</span>
+                        <strong>June 15, 2024</strong>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Total Marks:</span>
+                        <strong>540</strong>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Duration:</span>
+                        <strong>3 Hours</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Important Notice</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <small>
+                        <i class="fas fa-exclamation-circle"></i>
+                        This is a mock CET results page. All scores and ranks are randomly generated for demonstration purposes.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'admission:home' %}" class="btn btn-primary">
+            <i class="fas fa-home"></i> Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Choose Login Type - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 text-center mb-4">
+        <h2><i class="fas fa-sign-in-alt"></i> Choose Your Login Type</h2>
+        <p class="text-muted">Select the appropriate login portal for your account type</p>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 border-primary shadow-sm">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-user-graduate fa-4x text-primary"></i>
+                </div>
+                <h5 class="card-title text-primary">Student Portal</h5>
+                <p class="card-text">Access your student dashboard, apply for courses, upload documents, and track your admission status.</p>
+                <ul class="list-unstyled text-start">
+                    <li><i class="fas fa-check text-success"></i> Complete profile</li>
+                    <li><i class="fas fa-check text-success"></i> Course applications</li>
+                    <li><i class="fas fa-check text-success"></i> Document upload</li>
+                    <li><i class="fas fa-check text-success"></i> CET scores & ranks</li>
+                    <li><i class="fas fa-check text-success"></i> Counseling status</li>
+                </ul>
+                <a href="{% url 'authentication:student_login' %}" class="btn btn-primary btn-lg w-100">
+                    <i class="fas fa-sign-in-alt"></i> Student Login
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 border-success shadow-sm">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-university fa-4x text-success"></i>
+                </div>
+                <h5 class="card-title text-success">Institution Portal</h5>
+                <p class="card-text">Manage your institution's courses, view admitted students, and monitor seat allocation.</p>
+                <ul class="list-unstyled text-start">
+                    <li><i class="fas fa-check text-success"></i> Course management</li>
+                    <li><i class="fas fa-check text-success"></i> Student admissions</li>
+                    <li><i class="fas fa-check text-success"></i> Seat matrix</li>
+                    <li><i class="fas fa-check text-success"></i> Occupancy tracking</li>
+                    <li><i class="fas fa-check text-success"></i> Contact information</li>
+                </ul>
+                <a href="{% url 'authentication:institution_login' %}" class="btn btn-success btn-lg w-100">
+                    <i class="fas fa-sign-in-alt"></i> Institution Login
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 border-warning shadow-sm">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-cogs fa-4x text-warning"></i>
+                </div>
+                <h5 class="card-title text-warning">Admin Portal</h5>
+                <p class="card-text">System administration, manage the entire CET admission process and generate reports.</p>
+                <ul class="list-unstyled text-start">
+                    <li><i class="fas fa-check text-success"></i> System management</li>
+                    <li><i class="fas fa-check text-success"></i> Generate CET scores</li>
+                    <li><i class="fas fa-check text-success"></i> Run counseling</li>
+                    <li><i class="fas fa-check text-success"></i> Monitor applications</li>
+                    <li><i class="fas fa-check text-success"></i> Reports & analytics</li>
+                </ul>
+                <a href="{% url 'authentication:admin_login' %}" class="btn btn-warning btn-lg w-100 text-dark">
+                    <i class="fas fa-sign-in-alt"></i> Admin Login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h6 class="text-center"><i class="fas fa-info-circle"></i> Login Information</h6>
+                <div class="text-center mb-3">
+                    <div class="alert alert-info">
+                        <i class="fas fa-key"></i> <strong>Login with:</strong> Username or Email Address
+                    </div>
+                </div>
+                <h6 class="text-center"><i class="fas fa-user-circle"></i> Demo Credentials</h6>
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <strong>Student:</strong><br>
+                        <code>student1 / student123</code>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Institution:</strong><br>
+                        <code>rvce_admin / admin123</code>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Admin:</strong><br>
+                        <code>admin / admin123</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <p class="text-muted">
+            Don't have an account? 
+            <a href="{% url 'authentication:register' %}" class="btn btn-outline-primary">
+                <i class="fas fa-user-plus"></i> Register Now
+            </a>
+        </p>
+        <a href="{% url 'admission:home' %}" class="btn btn-link">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}
