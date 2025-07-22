@@ -174,6 +174,7 @@ Visit `http://127.0.0.1:8000/` to access the application.
 | **Admin** | `admin` | `admin@cet.edu` | `admin123` | Full System Access |
 | **Institution** | `rvce_admin` | `admin@rvce.edu` | `admin123` | RVCE Management |
 | **Institution** | `bmsce_admin` | `admin@bmsce.edu` | `admin123` | BMSCE Management |
+| **Institution** | `pesu_admin` | `admin@pesu.edu` | `admin123` | PESU Management |
 
 ### 📱 **Complete Student Journey**
 1. **Registration** → Create account with email/phone verification
