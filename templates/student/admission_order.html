@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admission Order - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            {% if allotment %}
+            <div class="card">
+                <div class="card-header bg-success text-white text-center">
+                    <h3 class="mb-0">
+                        <i class="fas fa-certificate me-2"></i>
+                        ADMISSION ORDER
+                    </h3>
+                    <p class="mb-0">Karnataka Common Entrance Test (KCET) - {{ allotment.counseling_round.round_name }}</p>
+                </div>
+                <div class="card-body">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <h4 class="text-primary">GOVERNMENT OF KARNATAKA</h4>
+                        <h5>Department of Technical Education</h5>
+                        <h6>Karnataka Examinations Authority (KEA)</h6>
+                        <hr>
+                    </div>
+
+                    <!-- Admission Order Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">ADMISSION ORDER DETAILS</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Order Number:</strong></td>
+                                    <td>{{ allotment.admission_order_number }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Date of Issue:</strong></td>
+                                    <td>{{ allotment.payment_date|date:"d/m/Y" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Counseling Round:</strong></td>
+                                    <td>{{ allotment.counseling_round.round_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Payment Reference:</strong></td>
+                                    <td>{{ allotment.payment_reference }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">STUDENT DETAILS</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Name:</strong></td>
+                                    <td>{{ allotment.student.user.get_full_name|upper }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Student ID:</strong></td>
+                                    <td>{{ allotment.student.student_id }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CET Rank:</strong></td>
+                                    <td>{{ allotment.student.cet_score.overall_rank }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Category:</strong></td>
+                                    <td>{{ allotment.allotment_category }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Admission Details -->
+                    <div class="alert alert-success">
+                        <h5 class="text-center mb-3">
+                            <i class="fas fa-graduation-cap me-2"></i>
+                            ADMISSION GRANTED
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-success">COURSE DETAILS</h6>
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td><strong>Course:</strong></td>
+                                        <td>{{ allotment.allotted_course }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Duration:</strong></td>
+                                        <td>4 Years (8 Semesters)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Degree:</strong></td>
+                                        <td>Bachelor of Engineering (B.E.)</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-success">INSTITUTION DETAILS</h6>
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td><strong>Institution:</strong></td>
+                                        <td>{{ allotment.allotted_institution.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Code:</strong></td>
+                                        <td>{{ allotment.allotted_institution.code }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Type:</strong></td>
+                                        <td>{{ allotment.allotted_institution.get_institution_type_display }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Location:</strong></td>
+                                        <td>{{ allotment.allotted_institution.city }}, {{ allotment.allotted_institution.state }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fee Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="text-primary">FEE PAYMENT DETAILS</h6>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td><strong>Fee Paid:</strong></td>
+                                    <td>₹{{ allotment.fee_amount|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Payment Date:</strong></td>
+                                    <td>{{ allotment.payment_date|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Payment Reference:</strong></td>
+                                    <td>{{ allotment.payment_reference }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Payment Status:</strong></td>
+                                    <td><span class="badge bg-success">PAID</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Important Instructions -->
+                    <div class="card border-warning mb-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                IMPORTANT INSTRUCTIONS
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>Report to Institution:</strong> You must report to the allotted institution within 7 days of this admission order.</li>
+                                <li><strong>Document Verification:</strong> Carry all original documents for verification during admission.</li>
+                                <li><strong>Fee Payment:</strong> Complete the remaining fee payment as per institution guidelines.</li>
+                                <li><strong>Medical Fitness:</strong> Submit medical fitness certificate if required by the institution.</li>
+                                <li><strong>Hostel Accommodation:</strong> Apply separately for hostel accommodation if required.</li>
+                                <li><strong>Academic Calendar:</strong> Follow the academic calendar as notified by the institution.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Required Documents -->
+                    <div class="card border-info mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-file-alt me-2"></i>
+                                DOCUMENTS REQUIRED FOR ADMISSION
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul>
+                                        <li>KCET Hall Ticket (Original)</li>
+                                        <li>KCET Rank Card (Original)</li>
+                                        <li>10th Standard Marks Card (Original)</li>
+                                        <li>12th Standard Marks Card (Original)</li>
+                                        <li>Transfer Certificate (Original)</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul>
+                                        <li>Conduct Certificate (Original)</li>
+                                        <li>Category Certificate (if applicable)</li>
+                                        <li>Income Certificate (if applicable)</li>
+                                        <li>Passport Size Photographs (6 copies)</li>
+                                        <li>This Admission Order (Print Copy)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="text-center mt-4">
+                        <p><strong>This is a computer-generated admission order and does not require a signature.</strong></p>
+                        <p class="text-muted">Generated on: {{ allotment.payment_date|date:"d/m/Y H:i:s" }}</p>
+                        
+                        <div class="mt-4">
+                            <button onclick="window.print()" class="btn btn-primary btn-lg me-3">
+                                <i class="fas fa-print me-2"></i>
+                                Print Admission Order
+                            </button>
+                            <a href="{% url 'student:allotment' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-danger text-center">
+                <h5>Admission Order Not Available</h5>
+                <p>{{ error }}</p>
+                <a href="{% url 'student:allotment' %}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Back to Allotments
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .btn, .card-header, nav, footer {
+        display: none !important;
+    }
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    body {
+        font-size: 12px;
+    }
+}
+</style>
+{% endblock %}

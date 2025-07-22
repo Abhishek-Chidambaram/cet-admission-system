@@ -14,4 +14,7 @@ urlpatterns = [
     path('counseling/', views.CounselingView.as_view(), name='counseling'),
     path('allotment/', views.AllotmentView.as_view(), name='allotment'),
     path('accept-seat/<int:allotment_id>/', views.AcceptSeatView.as_view(), name='accept_seat'),
+    path('choice-selection/<int:allotment_id>/', views.ChoiceSelectionView.as_view(), name='choice_selection'),
+    path('payment/<int:allotment_id>/', views.PaymentView.as_view(), name='payment'),
+    path('admission-order/<int:allotment_id>/', views.AdmissionOrderView.as_view(), name='admission_order'),
 ]

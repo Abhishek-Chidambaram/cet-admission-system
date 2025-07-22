@@ -187,10 +187,19 @@ class CounselingRound(models.Model):
         return f"Round {self.round_number} - {self.round_name}"
 
 class SeatAllotment(models.Model):
-    ACCEPTANCE_STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('accepted', 'Accepted'),
-        ('rejected', 'Rejected'),
+    CHOICE_OPTIONS = [
+        ('choice_1', 'Choice 1: Accept Seat (Final)'),
+        ('choice_2', 'Choice 2: Hold Seat, Try for Better'),
+        ('choice_3', 'Choice 3: Reject Seat, Try Next Round'),
+        ('choice_4', 'Choice 4: Exit Counselling'),
+        ('pending', 'Pending Decision'),
+    ]
+    
+    PAYMENT_STATUS_CHOICES = [
+        ('not_required', 'Not Required'),
+        ('pending', 'Payment Pending'),
+        ('paid', 'Payment Completed'),
+        ('failed', 'Payment Failed'),
     ]
     
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='allotments')
@@ -200,26 +209,143 @@ class SeatAllotment(models.Model):
     allotted_institution = models.ForeignKey('institution.Institution', on_delete=models.CASCADE)
     allotment_category = models.CharField(max_length=20)
     
-    acceptance_status = models.CharField(max_length=20, choices=ACCEPTANCE_STATUS_CHOICES, default='pending')
-    is_accepted = models.BooleanField(default=False)  # Keep for backward compatibility
+    # New KCET Choice System
+    student_choice = models.CharField(max_length=20, choices=CHOICE_OPTIONS, default='pending')
+    choice_made_at = models.DateTimeField(null=True, blank=True)
+    
+    # Fee Payment (Mock)
+    fee_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='not_required')
+    payment_date = models.DateTimeField(null=True, blank=True)
+    payment_reference = models.CharField(max_length=50, null=True, blank=True)
+    
+    # Admission Order
+    admission_order_generated = models.BooleanField(default=False)
+    admission_order_number = models.CharField(max_length=50, null=True, blank=True)
+    
+    # Legacy fields for backward compatibility
+    acceptance_status = models.CharField(max_length=20, default='pending')
+    is_accepted = models.BooleanField(default=False)
     acceptance_date = models.DateTimeField(null=True, blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     
-    def accept_seat(self):
-        self.acceptance_status = 'accepted'
-        self.is_accepted = True
-        self.acceptance_date = timezone.now()
-        self.save()
+    def make_choice(self, choice):
+        """Handle student's choice selection"""
+        self.student_choice = choice
+        self.choice_made_at = timezone.now()
         
-        self.student.application.status = 'admitted'
-        self.student.application.save()
+        if choice == 'choice_1':
+            # Accept seat - requires fee payment
+            self.acceptance_status = 'accepted'
+            self.is_accepted = True
+            self.acceptance_date = timezone.now()
+            self.fee_amount = self.calculate_fee()
+            self.payment_status = 'pending'
+            
+        elif choice == 'choice_2':
+            # Hold seat - requires fee payment
+            self.acceptance_status = 'held'
+            self.fee_amount = self.calculate_fee()
+            self.payment_status = 'pending'
+            
+        elif choice == 'choice_3':
+            # Reject seat - no fee required
+            self.acceptance_status = 'rejected'
+            self.payment_status = 'not_required'
+            
+        elif choice == 'choice_4':
+            # Exit counselling
+            self.acceptance_status = 'exited'
+            self.payment_status = 'not_required'
+            self.student.application.status = 'exited'
+            self.student.application.save()
+        
+        self.save()
+    
+    def calculate_fee(self):
+        """Calculate mock fee based on institution type and category"""
+        base_fee = 50000  # Base fee
+        
+        # Adjust based on institution type
+        if self.allotted_institution.institution_type == 'government':
+            base_fee = 25000
+        elif self.allotted_institution.institution_type == 'private':
+            base_fee = 75000
+        
+        # Category-based fee reduction
+        if self.allotment_category in ['SC', 'ST']:
+            base_fee *= 0.5  # 50% reduction
+        elif self.allotment_category in ['OBC', 'EWS']:
+            base_fee *= 0.7  # 30% reduction
+        
+        return base_fee
+    
+    def process_mock_payment(self):
+        """Simulate payment processing"""
+        import random
+        import string
+        
+        # 95% success rate for mock payment
+        if random.random() <= 0.95:
+            self.payment_status = 'paid'
+            self.payment_date = timezone.now()
+            self.payment_reference = 'PAY' + ''.join(random.choices(string.digits, k=10))
+            
+            # Generate admission order for Choice 1
+            if self.student_choice == 'choice_1':
+                self.generate_admission_order()
+            
+            self.save()
+            return True
+        else:
+            self.payment_status = 'failed'
+            self.save()
+            return False
+    
+    def generate_admission_order(self):
+        """Generate mock admission order"""
+        if not self.admission_order_generated:
+            year = timezone.now().year
+            count = SeatAllotment.objects.filter(
+                admission_order_generated=True,
+                created_at__year=year
+            ).count() + 1
+            
+            self.admission_order_number = f"ADM{year}{count:06d}"
+            self.admission_order_generated = True
+            
+            # Update student application status
+            self.student.application.status = 'admitted'
+            self.student.application.save()
+            
+            self.save()
+    
+    def is_eligible_for_next_round(self):
+        """Check if student is eligible for next counseling round"""
+        if self.student_choice in ['choice_2', 'choice_3']:
+            return True
+        elif self.student_choice == 'choice_1' and self.payment_status == 'paid':
+            return False  # Already admitted
+        elif self.student_choice == 'choice_4':
+            return False  # Exited counselling
+        return True
+    
+    def get_choice_display_with_status(self):
+        """Get choice display with payment status"""
+        choice_display = self.get_student_choice_display()
+        if self.student_choice in ['choice_1', 'choice_2'] and self.payment_status == 'pending':
+            choice_display += f" (Payment Pending: ₹{self.fee_amount:,.2f})"
+        elif self.student_choice in ['choice_1', 'choice_2'] and self.payment_status == 'paid':
+            choice_display += f" (Paid: ₹{self.fee_amount:,.2f})"
+        return choice_display
+    
+    # Legacy methods for backward compatibility
+    def accept_seat(self):
+        self.make_choice('choice_1')
     
     def reject_seat(self):
-        self.acceptance_status = 'rejected'
-        self.is_accepted = False
-        self.acceptance_date = timezone.now()
-        self.save()
+        self.make_choice('choice_3')
     
     def __str__(self):
-        return f"{self.student.student_id} - {self.allotted_course} at {self.allotted_institution.name}"
+        return f"{self.student.student_id} - {self.allotted_course} at {self.allotted_institution.name} (Round {self.counseling_round.round_number})"

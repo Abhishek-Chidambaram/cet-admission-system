@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Choice Selection - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        KCET Counseling - Choice Selection
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Allotment Details -->
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-check-circle me-2"></i>Congratulations! You have been allotted a seat.</h5>
+                        <p class="mb-0">Please review the details below and make your choice.</p>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Allotment Details:</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Course:</strong></td>
+                                    <td>{{ allotment.allotted_course }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Institution:</strong></td>
+                                    <td>{{ allotment.allotted_institution.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Category:</strong></td>
+                                    <td>{{ allotment.allotment_category }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Round:</strong></td>
+                                    <td>Round {{ allotment.counseling_round.round_number }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fee Amount:</strong></td>
+                                    <td><strong class="text-success">₹{{ fee_amount|floatformat:2 }}</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Institution Details:</h6>
+                            <p><strong>Address:</strong> {{ allotment.allotted_institution.address }}</p>
+                            <p><strong>Type:</strong> {{ allotment.allotted_institution.get_institution_type_display }}</p>
+                            <p><strong>Affiliation:</strong> {{ allotment.allotted_institution.affiliation }}</p>
+                        </div>
+                    </div>
+
+                    {% if can_make_choice %}
+                    <!-- Choice Selection -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="fas fa-hand-pointer me-2"></i>
+                                Select Your Choice
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <!-- Choice 1 -->
+                                        <div class="card border-success mb-3">
+                                            <div class="card-body">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="choice" value="choice_1" id="choice1">
+                                                    <label class="form-check-label" for="choice1">
+                                                        <strong class="text-success">Choice 1: Accept Seat (Final)</strong>
+                                                    </label>
+                                                </div>
+                                                <small class="text-muted">
+                                                    • Pay fees and download admission order<br>
+                                                    • You're out of future counseling rounds<br>
+                                                    • <strong>Final admission confirmed</strong>
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Choice 2 -->
+                                        <div class="card border-info mb-3">
+                                            <div class="card-body">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="choice" value="choice_2" id="choice2">
+                                                    <label class="form-check-label" for="choice2">
+                                                        <strong class="text-info">Choice 2: Hold Seat, Try for Better</strong>
+                                                    </label>
+                                                </div>
+                                                <small class="text-muted">
+                                                    • Pay fees to hold this seat<br>
+                                                    • Participate in next round for better options<br>
+                                                    • If no better option, this seat is yours
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <!-- Choice 3 -->
+                                        <div class="card border-warning mb-3">
+                                            <div class="card-body">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="choice" value="choice_3" id="choice3">
+                                                    <label class="form-check-label" for="choice3">
+                                                        <strong class="text-warning">Choice 3: Reject Seat, Try Next Round</strong>
+                                                    </label>
+                                                </div>
+                                                <small class="text-muted">
+                                                    • Don't pay fees<br>
+                                                    • Participate in next counseling round<br>
+                                                    • Risk: May not get any seat later
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Choice 4 -->
+                                        <div class="card border-danger mb-3">
+                                            <div class="card-body">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="choice" value="choice_4" id="choice4">
+                                                    <label class="form-check-label" for="choice4">
+                                                        <strong class="text-danger">Choice 4: Exit Counselling</strong>
+                                                    </label>
+                                                </div>
+                                                <small class="text-muted">
+                                                    • Exit from KCET counseling process<br>
+                                                    • No participation in future rounds<br>
+                                                    • <strong>Final decision - cannot be undone</strong>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <strong>Important:</strong> 
+                                    {% if allotment.counseling_round.round_number == 1 %}
+                                        This is Round 1. You have Rounds 2 and 3 available if you choose options 2 or 3.
+                                    {% elif allotment.counseling_round.round_number == 2 %}
+                                        This is Round 2. You have Round 3 available if you choose option 3.
+                                    {% else %}
+                                        This is the final Round 3. Choose carefully as no more rounds are available.
+                                    {% endif %}
+                                </div>
+
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary btn-lg me-3" onclick="return confirm('Are you sure about your choice? This decision cannot be changed.')">
+                                        <i class="fas fa-check me-2"></i>
+                                        Confirm My Choice
+                                    </button>
+                                    <a href="{% url 'student:allotment' %}" class="btn btn-secondary btn-lg">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        Back to Allotments
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Choice Already Made -->
+                    <div class="alert alert-info text-center">
+                        <h5><i class="fas fa-info-circle me-2"></i>Choice Already Made</h5>
+                        <p class="mb-0">You have already made your choice for this allotment.</p>
+                        <p><strong>Your Choice:</strong> {{ allotment.get_choice_display_with_status }}</p>
+                        {% if allotment.student_choice in 'choice_1,choice_2' and allotment.payment_status == 'pending' %}
+                            <a href="{% url 'student:payment' allotment.id %}" class="btn btn-warning mt-2">
+                                <i class="fas fa-credit-card me-2"></i>
+                                Complete Payment
+                            </a>
+                        {% elif allotment.admission_order_generated %}
+                            <a href="{% url 'student:admission_order' allotment.id %}" class="btn btn-success mt-2">
+                                <i class="fas fa-download me-2"></i>
+                                Download Admission Order
+                            </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add visual feedback for choice selection
+document.querySelectorAll('input[name="choice"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        // Remove previous selections
+        document.querySelectorAll('.card').forEach(function(card) {
+            card.classList.remove('border-primary', 'bg-light');
+        });
+        
+        // Highlight selected choice
+        if (this.checked) {
+            this.closest('.card').classList.add('border-primary', 'bg-light');
+        }
+    });
+});
+</script>
+{% endblock %}

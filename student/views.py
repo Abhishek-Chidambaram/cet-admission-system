@@ -172,22 +172,102 @@ class AllotmentView(StudentRequiredMixin, TemplateView):
             pass
         return context
 
-class AcceptSeatView(StudentRequiredMixin, TemplateView):
-    template_name = 'student/accept_seat.html'
+class ChoiceSelectionView(StudentRequiredMixin, TemplateView):
+    template_name = 'student/choice_selection.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         allotment_id = kwargs.get('allotment_id')
         student_profile = get_object_or_404(StudentProfile, user=self.request.user)
         allotment = get_object_or_404(SeatAllotment, id=allotment_id, student=student_profile)
-        context['allotment'] = allotment
+        
+        # Check if choice can still be made
+        can_make_choice = allotment.student_choice == 'pending'
+        
+        context.update({
+            'allotment': allotment,
+            'can_make_choice': can_make_choice,
+            'fee_amount': allotment.calculate_fee(),
+        })
         return context
     
     def post(self, request, allotment_id):
         student_profile = get_object_or_404(StudentProfile, user=request.user)
         allotment = get_object_or_404(SeatAllotment, id=allotment_id, student=student_profile)
         
-        allotment.accept_seat()
-        messages.success(request, f'Congratulations! You have accepted the seat for {allotment.allotted_course} at {allotment.allotted_institution.name}')
+        choice = request.POST.get('choice')
+        if choice and allotment.student_choice == 'pending':
+            allotment.make_choice(choice)
+            
+            choice_messages = {
+                'choice_1': f'You have accepted the seat for {allotment.allotted_course}. Please proceed with fee payment.',
+                'choice_2': f'You have chosen to hold the seat and try for better options in the next round. Please proceed with fee payment.',
+                'choice_3': f'You have rejected this seat and will participate in the next counseling round.',
+                'choice_4': f'You have exited the counseling process. You will not participate in future rounds.',
+            }
+            
+            messages.success(request, choice_messages.get(choice, 'Your choice has been recorded.'))
+            
+            # Redirect to payment if required
+            if choice in ['choice_1', 'choice_2']:
+                return redirect('student:payment', allotment_id=allotment.id)
         
         return redirect('student:allotment')
+
+class PaymentView(StudentRequiredMixin, TemplateView):
+    template_name = 'student/payment.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        allotment_id = kwargs.get('allotment_id')
+        student_profile = get_object_or_404(StudentProfile, user=self.request.user)
+        allotment = get_object_or_404(SeatAllotment, id=allotment_id, student=student_profile)
+        
+        context.update({
+            'allotment': allotment,
+            'can_pay': allotment.payment_status == 'pending',
+        })
+        return context
+    
+    def post(self, request, allotment_id):
+        student_profile = get_object_or_404(StudentProfile, user=request.user)
+        allotment = get_object_or_404(SeatAllotment, id=allotment_id, student=student_profile)
+        
+        if allotment.payment_status == 'pending':
+            # Process mock payment
+            payment_success = allotment.process_mock_payment()
+            
+            if payment_success:
+                if allotment.student_choice == 'choice_1':
+                    messages.success(request, f'Payment successful! Your admission is confirmed. Admission Order: {allotment.admission_order_number}')
+                else:
+                    messages.success(request, f'Payment successful! Your seat is held for the next round. Reference: {allotment.payment_reference}')
+            else:
+                messages.error(request, 'Payment failed! Please try again.')
+        
+        return redirect('student:allotment')
+
+class AdmissionOrderView(StudentRequiredMixin, TemplateView):
+    template_name = 'student/admission_order.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        allotment_id = kwargs.get('allotment_id')
+        student_profile = get_object_or_404(StudentProfile, user=self.request.user)
+        allotment = get_object_or_404(SeatAllotment, id=allotment_id, student=student_profile)
+        
+        # Only show admission order if payment is completed and choice was 1
+        if allotment.admission_order_generated and allotment.payment_status == 'paid':
+            context['allotment'] = allotment
+        else:
+            context['error'] = 'Admission order not available'
+        
+        return context
+
+# Keep legacy view for backward compatibility
+class AcceptSeatView(StudentRequiredMixin, TemplateView):
+    def get(self, request, allotment_id):
+        return redirect('student:choice_selection', allotment_id=allotment_id)
+    
+    def post(self, request, allotment_id):
+        return redirect('student:choice_selection', allotment_id=allotment_id)

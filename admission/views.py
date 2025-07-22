@@ -262,19 +262,56 @@ class RunSpecificRoundView(AdminRequiredMixin, TemplateView):
         # Prepare students for counseling
         self.prepare_students_for_counseling()
         
-        # Get eligible students based on round number
+        # Get eligible students based on KCET round rules
         if round_number == 1:
-            # Round 1: All students with CET scores who don't have any allotments
+            # Round 1: All eligible Engineering aspirants with valid CET ranks
             eligible_students = StudentProfile.objects.filter(
-                cet_score__isnull=False
+                cet_score__isnull=False,
+                application__status__in=['verified', 'counseling']
             ).exclude(
-                allotments__isnull=False
+                # Exclude students who already exited counselling
+                allotments__student_choice='choice_4'
             ).order_by('cet_score__overall_rank')
-        else:
-            # Round 2 and 3: All students with CET scores (they can get multiple allotments)
+            
+        elif round_number == 2:
+            # Round 2: Those who picked Choice 2 or 3 in Round 1 + those who didn't get any seat
             eligible_students = StudentProfile.objects.filter(
-                cet_score__isnull=False
-            ).order_by('cet_score__overall_rank')
+                cet_score__isnull=False,
+                application__status__in=['verified', 'counseling', 'allotted']
+            ).filter(
+                models.Q(
+                    # Students who chose Choice 2 or 3 in previous rounds
+                    allotments__student_choice__in=['choice_2', 'choice_3']
+                ) | models.Q(
+                    # Students who didn't get any seat in Round 1
+                    allotments__isnull=True
+                )
+            ).exclude(
+                # Exclude students who chose Choice 1 (already admitted) or Choice 4 (exited)
+                allotments__student_choice__in=['choice_1', 'choice_4']
+            ).distinct().order_by('cet_score__overall_rank')
+            
+        elif round_number == 3:
+            # Round 3: Only those who didn't get any seat so far OR chose Choice 3 in earlier rounds
+            # NOT open to those who already accepted a seat via Choice 1
+            eligible_students = StudentProfile.objects.filter(
+                cet_score__isnull=False,
+                application__status__in=['verified', 'counseling', 'allotted']
+            ).filter(
+                models.Q(
+                    # Students who chose Choice 3 in previous rounds
+                    allotments__student_choice='choice_3'
+                ) | models.Q(
+                    # Students who didn't get any seat so far
+                    allotments__isnull=True
+                )
+            ).exclude(
+                # Exclude students who chose Choice 1 (admitted) or Choice 4 (exited)
+                allotments__student_choice__in=['choice_1', 'choice_4']
+            ).distinct().order_by('cet_score__overall_rank')
+        
+        else:
+            eligible_students = StudentProfile.objects.none()
         
         courses = Course.objects.filter(is_active=True)
         allotted_count = 0
@@ -323,14 +360,21 @@ class RunSpecificRoundView(AdminRequiredMixin, TemplateView):
                         ).first()
                     
                     if course:
-                        # Check if seats are available (count only accepted allotments)
-                        existing_allotments = SeatAllotment.objects.filter(
-                            allotted_institution=course.institution,
-                            allotted_course=course.course_name,
-                            acceptance_status='accepted'
-                        ).count()
+                        # Check seat availability based on KCET logic
+                        if round_number == 1:
+                            # Round 1: All seats are available
+                            occupied_seats = 0
+                        else:
+                            # Round 2 & 3: Count seats held by Choice 1 and Choice 2 students
+                            occupied_seats = SeatAllotment.objects.filter(
+                                allotted_institution=course.institution,
+                                allotted_course=course.course_name,
+                                student_choice__in=['choice_1', 'choice_2'],
+                                payment_status='paid'
+                            ).count()
                         
-                        if existing_allotments < course.total_seats:
+                        available_seats = course.total_seats - occupied_seats
+                        if available_seats > 0:
                             # Handle None category
                             student_category = student.category or 'GENERAL'
                             

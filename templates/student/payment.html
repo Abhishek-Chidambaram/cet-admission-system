@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Fee Payment - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-credit-card me-2"></i>
+                        Fee Payment - KCET Counseling
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Payment Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Allotment Details:</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Course:</strong></td>
+                                    <td>{{ allotment.allotted_course }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Institution:</strong></td>
+                                    <td>{{ allotment.allotted_institution.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Round:</strong></td>
+                                    <td>Round {{ allotment.counseling_round.round_number }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Your Choice:</strong></td>
+                                    <td>{{ allotment.get_student_choice_display }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Payment Details:</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Fee Amount:</strong></td>
+                                    <td><h4 class="text-success">₹{{ allotment.fee_amount|floatformat:2 }}</h4></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Category:</strong></td>
+                                    <td>{{ allotment.allotment_category }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Institution Type:</strong></td>
+                                    <td>{{ allotment.allotted_institution.get_institution_type_display }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Payment Status:</strong></td>
+                                    <td>
+                                        <span class="badge bg-{% if allotment.payment_status == 'paid' %}success{% elif allotment.payment_status == 'pending' %}warning{% else %}danger{% endif %}">
+                                            {{ allotment.get_payment_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    {% if can_pay %}
+                    <!-- Payment Form -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-lock me-2"></i>
+                                Secure Payment Gateway (Mock)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Mock Payment System:</strong> This is a simulation of the payment process. 
+                                No real money will be charged. The system has a 95% success rate for demonstration purposes.
+                            </div>
+
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <!-- Mock Payment Details -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Card Number (Mock)</label>
+                                            <input type="text" class="form-control" value="4111 1111 1111 1111" readonly>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Expiry</label>
+                                                    <input type="text" class="form-control" value="12/25" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">CVV</label>
+                                                    <input type="text" class="form-control" value="123" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Cardholder Name</label>
+                                            <input type="text" class="form-control" value="{{ allotment.student.user.get_full_name }}" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Amount to Pay</label>
+                                            <input type="text" class="form-control" value="₹{{ allotment.fee_amount|floatformat:2 }}" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-warning">
+                                    <strong>Important:</strong>
+                                    {% if allotment.student_choice == 'choice_1' %}
+                                        After successful payment, your admission will be confirmed and you'll receive an admission order.
+                                    {% else %}
+                                        After successful payment, your seat will be held for the next counseling round.
+                                    {% endif %}
+                                </div>
+
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-success btn-lg me-3" onclick="return confirm('Proceed with payment of ₹{{ allotment.fee_amount|floatformat:2 }}?')">
+                                        <i class="fas fa-credit-card me-2"></i>
+                                        Pay ₹{{ allotment.fee_amount|floatformat:2 }}
+                                    </button>
+                                    <a href="{% url 'student:allotment' %}" class="btn btn-secondary btn-lg">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        Back to Allotments
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Payment Status -->
+                    <div class="text-center">
+                        {% if allotment.payment_status == 'paid' %}
+                            <div class="alert alert-success">
+                                <h5><i class="fas fa-check-circle me-2"></i>Payment Successful!</h5>
+                                <p><strong>Reference Number:</strong> {{ allotment.payment_reference }}</p>
+                                <p><strong>Payment Date:</strong> {{ allotment.payment_date|date:"M d, Y H:i" }}</p>
+                                
+                                {% if allotment.admission_order_generated %}
+                                    <a href="{% url 'student:admission_order' allotment.id %}" class="btn btn-success">
+                                        <i class="fas fa-download me-2"></i>
+                                        Download Admission Order
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% elif allotment.payment_status == 'failed' %}
+                            <div class="alert alert-danger">
+                                <h5><i class="fas fa-times-circle me-2"></i>Payment Failed</h5>
+                                <p>Your payment could not be processed. Please try again.</p>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-redo me-2"></i>
+                                        Retry Payment
+                                    </button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <h5>Payment Not Required</h5>
+                                <p>No payment is required for your current choice.</p>
+                            </div>
+                        {% endif %}
+                        
+                        <a href="{% url 'student:allotment' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Back to Allotments
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
