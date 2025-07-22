@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Seat Allotments - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-chair"></i> Seat Allotments</h2>
+                    <p class="text-muted">Manage and view all seat allocations</p>
+                </div>
+                <a href="{% url 'admission:admin_dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center bg-primary text-white">
+                <div class="card-body">
+                    <i class="fas fa-chair fa-2x mb-2"></i>
+                    <h3>{{ total_allotments }}</h3>
+                    <p>Total Allotments</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center bg-success text-white">
+                <div class="card-body">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h3>{{ accepted_allotments }}</h3>
+                    <p>Accepted</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center bg-warning text-white">
+                <div class="card-body">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h3>{{ pending_allotments }}</h3>
+                    <p>Pending</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Allotments Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> All Seat Allotments</h5>
+                </div>
+                <div class="card-body">
+                    {% if allotments %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Course</th>
+                                        <th>Institution</th>
+                                        <th>Category</th>
+                                        <th>Round</th>
+                                        <th>Status</th>
+                                        <th>Allotted Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for allotment in allotments %}
+                                    <tr>
+                                        <td>
+                                            <div>
+                                                <strong>{{ allotment.student.user.get_full_name }}</strong><br>
+                                                <small class="text-muted">{{ allotment.student.user.username }}</small><br>
+                                                {% if allotment.student.cet_score %}
+                                                    <small class="badge bg-info">Rank: {{ allotment.student.cet_score.overall_rank }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <strong>{{ allotment.allotted_course }}</strong>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ allotment.allotted_institution.name }}</strong><br>
+                                                <small class="text-muted">{{ allotment.allotted_institution.code }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ allotment.allotment_category }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">Round {{ allotment.counseling_round.round_number }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if allotment.acceptance_status == 'accepted' %}success{% elif allotment.acceptance_status == 'rejected' %}danger{% else %}warning{% endif %}">
+                                                {{ allotment.get_acceptance_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small>{{ allotment.created_at|date:"M d, Y H:i" }}</small>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        {% if is_paginated %}
+                        <nav aria-label="Allotments pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">&laquo; First</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                    </li>
+                                {% endif %}
+
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-chair fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Seat Allotments Yet</h4>
+                            <p class="text-muted">Run counseling rounds to generate seat allotments.</p>
+                            <a href="{% url 'admission:admin_dashboard' %}" class="btn btn-primary">
+                                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

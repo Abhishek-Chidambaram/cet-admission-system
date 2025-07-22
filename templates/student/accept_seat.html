@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accept Seat - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        Seat Acceptance Confirmation
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5>Congratulations! You have been allotted a seat.</h5>
+                        <p class="mb-0">Please review the details below and confirm your acceptance.</p>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Allotment Details:</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Course:</strong></td>
+                                    <td>{{ allotment.allotted_course }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Institution:</strong></td>
+                                    <td>{{ allotment.allotted_institution.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Category:</strong></td>
+                                    <td>{{ allotment.allotment_category }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Round:</strong></td>
+                                    <td>{{ allotment.counseling_round.round_name }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Institution Details:</h6>
+                            <p><strong>Address:</strong> {{ allotment.allotted_institution.address }}</p>
+                            <p><strong>Type:</strong> {{ allotment.allotted_institution.get_institution_type_display }}</p>
+                            <p><strong>Affiliation:</strong> {{ allotment.allotted_institution.affiliation }}</p>
+                        </div>
+                    </div>
+
+                    {% if allotment.acceptance_status == 'pending' %}
+                    <div class="alert alert-warning">
+                        <strong>Important:</strong> By accepting this seat, you confirm your admission to this course and institution. 
+                        This action cannot be undone for this counseling round.
+                    </div>
+
+                    <form method="post" class="text-center">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-lg me-3">
+                            <i class="fas fa-check me-2"></i>
+                            Accept Seat
+                        </button>
+                        <a href="{% url 'student:allotment' %}" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Back to Allotments
+                        </a>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-success text-center">
+                        <h5><i class="fas fa-check-circle me-2"></i>Seat Already Accepted</h5>
+                        <p class="mb-0">You have already accepted this seat allocation.</p>
+                        <p><strong>Status:</strong> {{ allotment.get_acceptance_status_display }}</p>
+                    </div>
+                    <div class="text-center">
+                        <a href="{% url 'student:allotment' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Back to Allotments
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

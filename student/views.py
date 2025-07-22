@@ -10,6 +10,12 @@ from .forms import StudentProfileForm, ApplicationForm, DocumentUploadForm
 class StudentRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_authenticated and self.request.user.user_type == 'student'
+    
+    def handle_no_permission(self):
+        from django.contrib import messages
+        from django.shortcuts import redirect
+        messages.error(self.request, 'Access denied. Student login required.')
+        return redirect('authentication:student_login')
 
 class StudentDashboardView(StudentRequiredMixin, TemplateView):
     template_name = 'student/dashboard.html'
@@ -39,8 +45,9 @@ class StudentProfileView(StudentRequiredMixin, UpdateView):
         try:
             return StudentProfile.objects.get(user=self.request.user)
         except StudentProfile.DoesNotExist:
-            # Return a new instance without saving it
-            return StudentProfile(user=self.request.user)
+            # Create and return a new profile instance
+            profile = StudentProfile(user=self.request.user)
+            return profile
     
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -54,9 +61,24 @@ class ApplicationView(StudentRequiredMixin, UpdateView):
     success_url = reverse_lazy('student:dashboard')
     
     def get_object(self):
-        student_profile = get_object_or_404(StudentProfile, user=self.request.user)
+        try:
+            student_profile = StudentProfile.objects.get(user=self.request.user)
+        except StudentProfile.DoesNotExist:
+            # Redirect to profile creation if profile doesn't exist
+            messages.error(self.request, 'Please complete your profile first before applying.')
+            return None
+        
         application, created = Application.objects.get_or_create(student=student_profile)
         return application
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Check if student profile exists
+        try:
+            StudentProfile.objects.get(user=request.user)
+        except StudentProfile.DoesNotExist:
+            messages.error(request, 'Please complete your profile first before applying.')
+            return redirect('student:profile')
+        return super().dispatch(request, *args, **kwargs)
     
     def form_valid(self, form):
         form.instance.student = get_object_or_404(StudentProfile, user=self.request.user)
@@ -82,13 +104,13 @@ class DocumentUploadView(StudentRequiredMixin, TemplateView):
         context.update({
             'student_profile': student_profile,
             'documents': student_profile.documents.all(),
-            'form': DocumentUploadForm(),
+            'form': DocumentUploadForm(student=student_profile),
         })
         return context
     
     def post(self, request, *args, **kwargs):
         student_profile = get_object_or_404(StudentProfile, user=request.user)
-        form = DocumentUploadForm(request.POST, request.FILES)
+        form = DocumentUploadForm(request.POST, request.FILES, student=student_profile)
         
         if form.is_valid():
             document = form.save(commit=False)
@@ -103,17 +125,9 @@ class DocumentUploadView(StudentRequiredMixin, TemplateView):
 
 class VerifyDocumentView(StudentRequiredMixin, TemplateView):
     def post(self, request, doc_id):
-        student_profile = get_object_or_404(StudentProfile, user=request.user)
-        document = get_object_or_404(StudentDocument, id=doc_id, student=student_profile)
-        
-        # Run mock AI verification
-        document.verify_document()
-        
-        if document.verification_status == 'verified':
-            messages.success(request, f'Document {document.document_type} verified successfully!')
-        else:
-            messages.warning(request, f'Document {document.document_type} verification failed. Please reupload.')
-        
+        # This view is no longer needed as verification is done by admin
+        # Redirect to documents page with info message
+        messages.info(request, 'Document verification is now handled by administrators. Your documents will be reviewed shortly.')
         return redirect('student:documents')
 
 class CETScoreView(StudentRequiredMixin, TemplateView):
@@ -159,6 +173,16 @@ class AllotmentView(StudentRequiredMixin, TemplateView):
         return context
 
 class AcceptSeatView(StudentRequiredMixin, TemplateView):
+    template_name = 'student/accept_seat.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        allotment_id = kwargs.get('allotment_id')
+        student_profile = get_object_or_404(StudentProfile, user=self.request.user)
+        allotment = get_object_or_404(SeatAllotment, id=allotment_id, student=student_profile)
+        context['allotment'] = allotment
+        return context
+    
     def post(self, request, allotment_id):
         student_profile = get_object_or_404(StudentProfile, user=request.user)
         allotment = get_object_or_404(SeatAllotment, id=allotment_id, student=student_profile)

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Undo Counseling - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-undo me-2"></i>
+                        Undo Counseling Round
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if counseling_round %}
+                        <div class="alert alert-warning">
+                            <h5><i class="fas fa-exclamation-triangle me-2"></i>Warning!</h5>
+                            <p>You are about to undo <strong>{{ counseling_round.round_name }}</strong>. This action will:</p>
+                            <ul>
+                                <li>Remove all {{ allotments_count }} seat allotments from this round</li>
+                                <li>Reset student application status from 'allotted' back to 'verified'</li>
+                                <li>Deactivate the counseling round</li>
+                                <li><strong>This action cannot be undone!</strong></li>
+                            </ul>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6>Round Details:</h6>
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td><strong>Round Number:</strong></td>
+                                        <td>{{ counseling_round.round_number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Round Name:</strong></td>
+                                        <td>{{ counseling_round.round_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Status:</strong></td>
+                                        <td>
+                                            <span class="badge bg-{% if counseling_round.is_active %}success{% else %}secondary{% endif %}">
+                                                {% if counseling_round.is_active %}Active{% else %}Inactive{% endif %}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Total Allotments:</strong></td>
+                                        <td>{{ allotments_count }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Affected Students:</h6>
+                                {% if allotments %}
+                                    <div class="list-group" style="max-height: 300px; overflow-y: auto;">
+                                        {% for allotment in allotments %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>{{ allotment.student.user.get_full_name }}</strong><br>
+                                                <small class="text-muted">{{ allotment.allotted_course }} at {{ allotment.allotted_institution.name }}</small>
+                                            </div>
+                                            <span class="badge bg-{% if allotment.acceptance_status == 'accepted' %}success{% elif allotment.acceptance_status == 'rejected' %}danger{% else %}warning{% endif %}">
+                                                {{ allotment.get_acceptance_status_display }}
+                                            </span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted">No allotments found for this round.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if allotments_count > 0 %}
+                        <div class="text-center">
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-lg me-3" onclick="return confirm('Are you absolutely sure you want to undo this counseling round? This will remove {{ allotments_count }} seat allotments and cannot be undone!')">
+                                    <i class="fas fa-undo me-2"></i>
+                                    Yes, Undo Counseling Round
+                                </button>
+                            </form>
+                            <a href="{% url 'admission:admin_dashboard' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Cancel
+                            </a>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info text-center">
+                            <h5>No Allotments to Undo</h5>
+                            <p class="mb-0">This counseling round has no seat allotments to remove.</p>
+                        </div>
+                        <div class="text-center">
+                            <a href="{% url 'admission:admin_dashboard' %}" class="btn btn-primary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-danger text-center">
+                            <h5>Counseling Round Not Found</h5>
+                            <p class="mb-0">The requested counseling round could not be found.</p>
+                        </div>
+                        <div class="text-center">
+                            <a href="{% url 'admission:admin_dashboard' %}" class="btn btn-primary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

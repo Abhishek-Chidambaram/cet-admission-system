@@ -24,21 +24,21 @@ class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
     student_id = models.CharField(max_length=20, unique=True, editable=False)
     
-    date_of_birth = models.DateField()
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    date_of_birth = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, null=True, blank=True)
     
-    address = models.TextField()
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    pincode = models.CharField(max_length=10)
+    address = models.TextField(null=True, blank=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
+    state = models.CharField(max_length=100, null=True, blank=True)
+    pincode = models.CharField(max_length=10, null=True, blank=True)
     
-    father_name = models.CharField(max_length=100)
-    mother_name = models.CharField(max_length=100)
-    parent_phone = models.CharField(max_length=17)
+    father_name = models.CharField(max_length=100, null=True, blank=True)
+    mother_name = models.CharField(max_length=100, null=True, blank=True)
+    parent_phone = models.CharField(max_length=17, null=True, blank=True)
     
-    school_name = models.CharField(max_length=200)
-    board = models.CharField(max_length=100)
+    school_name = models.CharField(max_length=200, null=True, blank=True)
+    board = models.CharField(max_length=100, null=True, blank=True)
     
     photo = models.ImageField(upload_to='student_photos/', null=True, blank=True)
     
@@ -124,6 +124,22 @@ class Application(models.Model):
             return True
         return False
     
+    def verify_application(self):
+        """Verify application after document verification"""
+        if self.status == 'submitted':
+            # Check if all required documents are verified
+            required_docs = ['photo', '10th_certificate', '12th_certificate']
+            verified_docs = self.student.documents.filter(
+                document_type__in=required_docs,
+                verification_status='verified'
+            ).count()
+            
+            if verified_docs >= len(required_docs):
+                self.status = 'verified'
+                self.save()
+                return True
+        return False
+    
     def __str__(self):
         return f"{self.application_number} - {self.student.user.get_full_name()}"
 
@@ -148,33 +164,12 @@ class StudentDocument(models.Model):
     document_file = models.FileField(upload_to='student_documents/')
     
     verification_status = models.CharField(max_length=30, choices=VERIFICATION_STATUS_CHOICES, default='pending')
-    ai_verification_score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    verified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='verified_documents')
+    verified_at = models.DateTimeField(null=True, blank=True)
+    rejection_reason = models.TextField(blank=True, null=True)
     verification_comments = models.TextField(blank=True, null=True)
     
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    
-    def verify_document(self):
-        """Mock AI verification - mostly successful with realistic scoring"""
-        # Simulate AI verification with higher success rate (90% success)
-        success_rate = random.random()
-        
-        if success_rate <= 0.9:  # 90% success rate
-            self.ai_verification_score = round(random.uniform(85.0, 98.0), 2)
-            self.verification_status = 'verified'
-            self.verification_comments = f"Document verified successfully. AI confidence: {self.ai_verification_score}%. Document appears authentic and meets quality standards."
-        else:  # 10% rejection rate
-            self.ai_verification_score = round(random.uniform(60.0, 84.0), 2)
-            self.verification_status = 'rejected'
-            rejection_reasons = [
-                "Document image quality is too low",
-                "Text is not clearly visible",
-                "Document appears to be incomplete",
-                "Watermark or seal is not clear"
-            ]
-            reason = random.choice(rejection_reasons)
-            self.verification_comments = f"Document verification failed. AI confidence: {self.ai_verification_score}%. Reason: {reason}. Please reupload a clearer image."
-        
-        self.save()
     
     def __str__(self):
         return f"{self.student.student_id} - {self.document_type}"
@@ -192,6 +187,12 @@ class CounselingRound(models.Model):
         return f"Round {self.round_number} - {self.round_name}"
 
 class SeatAllotment(models.Model):
+    ACCEPTANCE_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    ]
+    
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='allotments')
     counseling_round = models.ForeignKey(CounselingRound, on_delete=models.CASCADE)
     
@@ -199,18 +200,26 @@ class SeatAllotment(models.Model):
     allotted_institution = models.ForeignKey('institution.Institution', on_delete=models.CASCADE)
     allotment_category = models.CharField(max_length=20)
     
-    is_accepted = models.BooleanField(default=False)
+    acceptance_status = models.CharField(max_length=20, choices=ACCEPTANCE_STATUS_CHOICES, default='pending')
+    is_accepted = models.BooleanField(default=False)  # Keep for backward compatibility
     acceptance_date = models.DateTimeField(null=True, blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     
     def accept_seat(self):
+        self.acceptance_status = 'accepted'
         self.is_accepted = True
         self.acceptance_date = timezone.now()
         self.save()
         
         self.student.application.status = 'admitted'
         self.student.application.save()
+    
+    def reject_seat(self):
+        self.acceptance_status = 'rejected'
+        self.is_accepted = False
+        self.acceptance_date = timezone.now()
+        self.save()
     
     def __str__(self):
         return f"{self.student.student_id} - {self.allotted_course} at {self.allotted_institution.name}"

@@ -68,6 +68,22 @@ class DocumentUploadForm(forms.ModelForm):
         fields = ['document_type', 'document_file']
     
     def __init__(self, *args, **kwargs):
+        self.student = kwargs.pop('student', None)
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
+    
+    def clean_document_type(self):
+        document_type = self.cleaned_data['document_type']
+        if self.student:
+            # Check if this document type already exists for this student
+            existing = StudentDocument.objects.filter(
+                student=self.student,
+                document_type=document_type
+            ).exclude(pk=self.instance.pk if self.instance else None)
+            
+            if existing.exists():
+                doc_type_display = dict(StudentDocument.DOCUMENT_TYPE_CHOICES).get(document_type, document_type)
+                raise forms.ValidationError(f"You have already uploaded a {doc_type_display}. Please delete the existing one first.")
+        
+        return document_type

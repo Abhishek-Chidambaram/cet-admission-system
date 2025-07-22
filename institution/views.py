@@ -8,6 +8,12 @@ from student.models import SeatAllotment, StudentProfile
 class InstitutionRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_authenticated and self.request.user.user_type == 'institution'
+    
+    def handle_no_permission(self):
+        from django.contrib import messages
+        from django.shortcuts import redirect
+        messages.error(self.request, 'Access denied. Institution login required.')
+        return redirect('authentication:institution_login')
 
 class InstitutionDashboardView(InstitutionRequiredMixin, TemplateView):
     template_name = 'institution/dashboard.html'

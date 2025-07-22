@@ -52,6 +52,54 @@
     </div>
 </div>
 
+<div class="row mt-3">
+    <div class="col-md-3">
+        <div class="card text-center bg-secondary text-white">
+            <div class="card-body">
+                <i class="fas fa-chair fa-2x mb-2"></i>
+                <h3>{{ total_seat_allotments }}</h3>
+                <p>Seat Allotments</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center bg-dark text-white">
+            <div class="card-body">
+                <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+                <h3>{{ allotted_applications }}</h3>
+                <p>Allotted Students</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-list"></i> Counseling Rounds</h6>
+            </div>
+            <div class="card-body p-2">
+                {% if counseling_rounds %}
+                    {% for round in counseling_rounds %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-{% if round.is_active %}success{% else %}secondary{% endif %}">
+                                Round {{ round.round_number }}
+                            </span>
+                            {% if round.is_active %}
+                                <a href="{% url 'admission:undo_counseling' round.id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-undo"></i> Undo
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <small class="text-muted">No counseling rounds yet</small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row mt-4">
     <div class="col-md-6">
         <div class="card">
@@ -67,12 +115,32 @@
                         </button>
                     </form>
                     
-                    <form method="post" action="{% url 'admission:run_counseling' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-success btn-block">
-                            <i class="fas fa-play"></i> Run Counseling Round
-                        </button>
-                    </form>
+                    <div class="row">
+                        <div class="col-4">
+                            <form method="post" action="{% url 'admission:run_specific_round' 1 %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm w-100">
+                                    <i class="fas fa-play"></i> Round 1
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-4">
+                            <form method="post" action="{% url 'admission:run_specific_round' 2 %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm w-100">
+                                    <i class="fas fa-play"></i> Round 2
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-4">
+                            <form method="post" action="{% url 'admission:run_specific_round' 3 %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm w-100">
+                                    <i class="fas fa-play"></i> Round 3
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                     
                     <a href="{% url 'admission:student_list' %}" class="btn btn-info">
                         <i class="fas fa-list"></i> View All Students
@@ -80,6 +148,14 @@
                     
                     <a href="{% url 'admission:institution_list' %}" class="btn btn-warning">
                         <i class="fas fa-building"></i> View All Institutions
+                    </a>
+                    
+                    <a href="{% url 'admission:seat_allotments' %}" class="btn btn-secondary">
+                        <i class="fas fa-chair"></i> View Seat Allotments
+                    </a>
+                    
+                    <a href="{% url 'admission:document_verification' %}" class="btn btn-danger">
+                        <i class="fas fa-file-check"></i> Document Verification
                     </a>
                 </div>
             </div>
@@ -106,6 +182,60 @@
                     </div>
                 {% else %}
                     <p class="text-muted">No applications yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chair"></i> Recent Seat Allotments</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_allotments %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Course</th>
+                                    <th>Institution</th>
+                                    <th>Round</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for allotment in recent_allotments %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ allotment.student.user.get_full_name }}</strong><br>
+                                        <small class="text-muted">{{ allotment.student.user.username }}</small>
+                                    </td>
+                                    <td>{{ allotment.allotted_course }}</td>
+                                    <td>{{ allotment.allotted_institution.name }}</td>
+                                    <td>
+                                        <span class="badge bg-info">Round {{ allotment.counseling_round.round_number }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if allotment.acceptance_status == 'accepted' %}success{% elif allotment.acceptance_status == 'rejected' %}danger{% else %}warning{% endif %}">
+                                            {{ allotment.get_acceptance_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center">
+                        <a href="{% url 'admission:seat_allotments' %}" class="btn btn-sm btn-outline-primary">
+                            View All Allotments
+                        </a>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">No seat allotments yet.</p>
                 {% endif %}
             </div>
         </div>

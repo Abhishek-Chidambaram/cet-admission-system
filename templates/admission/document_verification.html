@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Document Verification - CET Admission System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-file-check"></i> Document Verification</h2>
+                    <p class="text-muted">Review and verify student documents manually</p>
+                </div>
+                <a href="{% url 'admission:admin_dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Documents -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5><i class="fas fa-clock"></i> Pending Documents ({{ pending_documents.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_documents %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Document Type</th>
+                                        <th>Uploaded Date</th>
+                                        <th>File</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for doc in pending_documents %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ doc.student.user.get_full_name }}</strong><br>
+                                            <small class="text-muted">{{ doc.student.user.username }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ doc.get_document_type_display }}</span>
+                                        </td>
+                                        <td>
+                                            <small>{{ doc.uploaded_at|date:"M d, Y H:i" }}</small>
+                                        </td>
+                                        <td>
+                                            {% if doc.document_file %}
+                                                <a href="{{ doc.document_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i> View Document
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted">No file uploaded</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <form method="post" action="{% url 'admission:verify_document' doc.id %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="verify">
+                                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Verify this document?')">
+                                                        <i class="fas fa-check"></i> Accept
+                                                    </button>
+                                                </form>
+                                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal{{ doc.id }}">
+                                                    <i class="fas fa-times"></i> Reject
+                                                </button>
+                                            </div>
+
+                                            <!-- Reject Modal -->
+                                            <div class="modal fade" id="rejectModal{{ doc.id }}" tabindex="-1">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Reject Document</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <form method="post" action="{% url 'admission:verify_document' doc.id %}">
+                                                            {% csrf_token %}
+                                                            <div class="modal-body">
+                                                                <input type="hidden" name="action" value="reject">
+                                                                <div class="mb-3">
+                                                                    <label for="rejection_reason{{ doc.id }}" class="form-label">Rejection Reason:</label>
+                                                                    <textarea class="form-control" id="rejection_reason{{ doc.id }}" name="rejection_reason" rows="3" required>Document does not meet requirements</textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                <button type="submit" class="btn btn-danger">Reject Document</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h4 class="text-muted">No Pending Documents</h4>
+                            <p class="text-muted">All documents have been reviewed.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recently Verified Documents -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h6><i class="fas fa-check-circle"></i> Recently Verified ({{ verified_documents.count }})</h6>
+                </div>
+                <div class="card-body">
+                    {% if verified_documents %}
+                        <div class="list-group list-group-flush">
+                            {% for doc in verified_documents %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ doc.student.user.get_full_name }}</strong><br>
+                                    <small class="text-muted">{{ doc.get_document_type_display }}</small><br>
+                                    <small class="text-success">Verified: {{ doc.verified_at|date:"M d, H:i" }}</small>
+                                </div>
+                                <span class="badge bg-success">Verified</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No verified documents yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h6><i class="fas fa-times-circle"></i> Recently Rejected ({{ rejected_documents.count }})</h6>
+                </div>
+                <div class="card-body">
+                    {% if rejected_documents %}
+                        <div class="list-group list-group-flush">
+                            {% for doc in rejected_documents %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <strong>{{ doc.student.user.get_full_name }}</strong><br>
+                                        <small class="text-muted">{{ doc.get_document_type_display }}</small><br>
+                                        <small class="text-danger">Rejected: {{ doc.verified_at|date:"M d, H:i" }}</small>
+                                        {% if doc.rejection_reason %}
+                                            <br><small class="text-muted">{{ doc.rejection_reason }}</small>
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-flex flex-column align-items-end">
+                                        <span class="badge bg-danger mb-2">Rejected</span>
+                                        <div class="btn-group-vertical btn-group-sm">
+                                            {% if doc.document_file %}
+                                                <a href="{{ doc.document_file.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                            {% endif %}
+                                            <form method="post" action="{% url 'admission:verify_document' doc.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="verify">
+                                                <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Accept this rejected document?')">
+                                                    <i class="fas fa-check"></i> Accept
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No rejected documents yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
