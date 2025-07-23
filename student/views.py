@@ -71,6 +71,47 @@ class ApplicationView(StudentRequiredMixin, UpdateView):
         application, created = Application.objects.get_or_create(student=student_profile)
         return application
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Add institutions and courses data for dynamic selection
+        from institution.models import Institution, Course
+        import json
+        
+        institutions = Institution.objects.filter(is_active=True).order_by('name')
+        courses_data = {}
+        
+        for institution in institutions:
+            courses = Course.objects.filter(
+                institution=institution, 
+                is_active=True
+            ).order_by('course_name')
+            courses_data[str(institution.id)] = [
+                {
+                    'value': f"{institution.code}_{course.course_code}",
+                    'name': course.course_name,
+                    'code': course.course_code
+                }
+                for course in courses
+            ]
+        
+        # Only pass valid preferences (properly formatted strings)
+        current_prefs = []
+        if self.object and self.object.course_preferences:
+            if isinstance(self.object.course_preferences, list):
+                # Filter out invalid preferences - only keep properly formatted ones
+                current_prefs = [
+                    pref for pref in self.object.course_preferences 
+                    if pref and isinstance(pref, str) and '_' in pref and len(pref) > 3
+                ]
+        
+        context.update({
+            'institutions': institutions,
+            'courses_data_json': json.dumps(courses_data),
+            'current_preferences': current_prefs
+        })
+        return context
+    
     def dispatch(self, request, *args, **kwargs):
         # Check if student profile exists
         try:

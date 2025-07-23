@@ -40,7 +40,7 @@
                                 <tr>
                                     <th>Document Type</th>
                                     <th>Status</th>
-                                    <th>AI Score</th>
+                                    <th>Verified By</th>
                                     <th>Upload Date</th>
                                     <th>Actions</th>
                                 </tr>
@@ -59,10 +59,10 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if doc.ai_verification_score %}
-                                            {{ doc.ai_verification_score }}%
+                                        {% if doc.verified_by %}
+                                            {{ doc.verified_by.get_full_name }}
                                         {% else %}
-                                            -
+                                            <span class="text-muted">Pending Review</span>
                                         {% endif %}
                                     </td>
                                     <td>{{ doc.uploaded_at|date:"M d, Y" }}</td>
@@ -70,13 +70,10 @@
                                         <a href="{{ doc.document_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye"></i> View
                                         </a>
-                                        {% if doc.verification_status == 'pending' %}
-                                            <form method="post" action="{% url 'student:verify_document' doc.id %}" style="display: inline;">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-outline-success">
-                                                    <i class="fas fa-robot"></i> AI Verify
-                                                </button>
-                                            </form>
+                                        {% if doc.verification_status == 'rejected' and doc.rejection_reason %}
+                                            <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="{{ doc.rejection_reason }}">
+                                                <i class="fas fa-info-circle"></i> Info
+                                            </button>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -97,48 +94,38 @@
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-list-check"></i> Required Documents</h5>
-            </div>
-            <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Passport Size Photo
-                        <span class="badge bg-warning">Pending</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        10th Grade Certificate
-                        <span class="badge bg-warning">Pending</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        12th Grade Certificate
-                        <span class="badge bg-warning">Pending</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        CET Hall Ticket
-                        <span class="badge bg-warning">Pending</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Category Certificate
-                        <span class="badge bg-secondary">Optional</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="card mt-3">
-            <div class="card-header">
-                <h5><i class="fas fa-robot"></i> AI Verification</h5>
+                <h5><i class="fas fa-info-circle"></i> Document Information</h5>
             </div>
             <div class="card-body">
                 <div class="alert alert-info">
-                    <small>
-                        <i class="fas fa-info-circle"></i>
-                        Our AI system automatically verifies document authenticity and quality. 
-                        Documents with 85%+ confidence are automatically approved.
-                    </small>
+                    <h6><i class="fas fa-upload"></i> Upload Guidelines</h6>
+                    <ul class="mb-0">
+                        <li>Upload clear, readable documents</li>
+                        <li>Supported formats: PDF, JPG, PNG</li>
+                        <li>Maximum file size: 5MB</li>
+                        <li>Documents will be reviewed by admin</li>
+                    </ul>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-clock"></i> Verification Process</h6>
+                    <p class="mb-0">
+                        All documents are manually reviewed by administrators. 
+                        You will be notified once verification is complete.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+// Initialize tooltips for rejection reason info
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
 {% endblock %}

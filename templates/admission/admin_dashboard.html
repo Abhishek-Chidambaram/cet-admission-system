@@ -108,12 +108,24 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <form method="post" action="{% url 'admission:generate_scores' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-primary btn-block">
-                            <i class="fas fa-random"></i> Generate Mock CET Scores
-                        </button>
-                    </form>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <form method="post" action="{% url 'admission:generate_scores' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-block w-100">
+                                    <i class="fas fa-random"></i> Generate CET Scores
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-6">
+                            <form method="post" action="{% url 'admission:remove_scores' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-block w-100">
+                                    <i class="fas fa-trash"></i> Remove CET Scores
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                     
                     <div class="row">
                         <div class="col-4">
@@ -242,17 +254,5 @@
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="alert alert-info">
-            <h5><i class="fas fa-info-circle"></i> System Information</h5>
-            <p>This is a mock CET admission system. All data and processes are simulated for educational purposes.</p>
-            <ul>
-                <li><strong>Mock Features:</strong> AI document verification, payment processing, SMS/Email notifications</li>
-                <li><strong>Data Generation:</strong> CET scores and ranks are randomly generated</li>
-                <li><strong>Counseling:</strong> Seat allocation is done through mock algorithms</li>
-            </ul>
-        </div>
-    </div>
-</div>
+
 {% endblock %}

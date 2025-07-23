@@ -96,6 +96,29 @@ class GenerateScoresView(AdminRequiredMixin, TemplateView):
         messages.success(request, f'Generated CET scores for {generated_count} students.')
         return redirect('admission:admin_dashboard')
 
+class RemoveCETScoresView(AdminRequiredMixin, TemplateView):
+    template_name = 'admission/remove_scores.html'
+    
+    def post(self, request, *args, **kwargs):
+        # Delete all CET scores
+        scores_count = CETScore.objects.count()
+        CETScore.objects.all().delete()
+        
+        # Reset application status for students with allotments
+        applications = Application.objects.filter(status='allotted')
+        for application in applications:
+            application.status = 'verified'
+            application.save()
+        
+        # Delete all seat allotments
+        SeatAllotment.objects.all().delete()
+        
+        # Reset counseling rounds
+        CounselingRound.objects.all().update(is_active=False)
+        
+        messages.success(request, f'Successfully removed {scores_count} CET scores and reset related data.')
+        return redirect('admission:admin_dashboard')
+
 class RunCounselingView(AdminRequiredMixin, TemplateView):
     template_name = 'admission/run_counseling.html'
     
@@ -499,41 +522,36 @@ class SeatAllotmentListView(AdminRequiredMixin, ListView):
         })
         return context
 
-class DocumentVerificationView(AdminRequiredMixin, TemplateView):
+class DocumentVerificationView(AdminRequiredMixin, ListView):
+    model = StudentProfile
     template_name = 'admission/document_verification.html'
+    context_object_name = 'students'
+    paginate_by = 20
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        from student.models import StudentDocument
-        
-        context.update({
-            'pending_documents': StudentDocument.objects.filter(verification_status='pending').select_related('student__user'),
-            'verified_documents': StudentDocument.objects.filter(verification_status='verified').select_related('student__user')[:20],
-            'rejected_documents': StudentDocument.objects.filter(verification_status='rejected').select_related('student__user')[:20],
-        })
-        return context
+    def get_queryset(self):
+        return StudentProfile.objects.filter(
+            documents__isnull=False,
+            documents__verification_status='pending'
+        ).distinct()
 
 class VerifyDocumentAdminView(AdminRequiredMixin, TemplateView):
     def post(self, request, doc_id):
-        from student.models import StudentDocument
-        document = get_object_or_404(StudentDocument, id=doc_id)
+        from student.models import Document
+        document = get_object_or_404(Document, id=doc_id)
+        
         action = request.POST.get('action')
-        
-        if action == 'verify':
+        if action == 'approve':
             document.verification_status = 'verified'
-            document.verified_by = request.user
-            document.verified_at = timezone.now()
-            document.save()
-            messages.success(request, f'Document {document.document_type} for {document.student.user.username} has been verified.')
-        
+            document.verification_date = timezone.now()
+            document.verification_comment = 'Document verified by admin'
+            messages.success(request, f'Document {document.document_type} has been approved.')
         elif action == 'reject':
             document.verification_status = 'rejected'
-            document.verified_by = request.user
-            document.verified_at = timezone.now()
-            document.rejection_reason = request.POST.get('rejection_reason', 'Document does not meet requirements')
-            document.save()
-            messages.warning(request, f'Document {document.document_type} for {document.student.user.username} has been rejected.')
+            document.verification_date = timezone.now()
+            document.verification_comment = request.POST.get('comment', 'Document rejected by admin')
+            messages.warning(request, f'Document {document.document_type} has been rejected.')
         
+        document.save()
         return redirect('admission:document_verification')
 
 class ResultsView(TemplateView):
@@ -541,8 +559,11 @@ class ResultsView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({
-            'top_rankers': CETScore.objects.order_by('overall_rank')[:10],
-            'total_students': CETScore.objects.count(),
-        })
+        
+        # Get top 100 students by rank
+        top_students = StudentProfile.objects.filter(
+            cet_score__isnull=False
+        ).order_by('cet_score__overall_rank')[:100]
+        
+        context['top_students'] = top_students
         return context

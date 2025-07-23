@@ -14,6 +14,13 @@ class LoginView(DjangoLoginView):
     form_class = CustomAuthenticationForm
     redirect_authenticated_user = True
     
+    def dispatch(self, request, *args, **kwargs):
+        # If user is already logged in, show a message instead of redirecting in a loop
+        if self.request.user.is_authenticated:
+            messages.info(self.request, 'You are already logged in.')
+            return redirect(self.get_success_url())
+        return super().dispatch(request, *args, **kwargs)
+    
     def get_success_url(self):
         user = self.request.user
         if user.user_type == 'student':
@@ -32,6 +39,13 @@ class StudentLoginView(DjangoLoginView):
     def get_success_url(self):
         return reverse_lazy('student:dashboard')
     
+    def dispatch(self, request, *args, **kwargs):
+        # If user is already logged in, show a message instead of redirecting in a loop
+        if self.request.user.is_authenticated:
+            messages.warning(self.request, 'You are already logged in. Please log out first before trying to log in as a student.')
+            return redirect('admission:home')
+        return super().dispatch(request, *args, **kwargs)
+    
     def form_valid(self, form):
         user = form.get_user()
         if user.user_type != 'student':
@@ -47,6 +61,13 @@ class AdminLoginView(DjangoLoginView):
     def get_success_url(self):
         return reverse_lazy('admission:admin_dashboard')
     
+    def dispatch(self, request, *args, **kwargs):
+        # If user is already logged in, show a message instead of redirecting in a loop
+        if self.request.user.is_authenticated:
+            messages.warning(self.request, 'You are already logged in. Please log out first before trying to log in as an administrator.')
+            return redirect('admission:home')
+        return super().dispatch(request, *args, **kwargs)
+    
     def form_valid(self, form):
         user = form.get_user()
         if user.user_type != 'admin':
@@ -61,6 +82,13 @@ class InstitutionLoginView(DjangoLoginView):
     
     def get_success_url(self):
         return reverse_lazy('institution:dashboard')
+    
+    def dispatch(self, request, *args, **kwargs):
+        # If user is already logged in, show a message instead of redirecting in a loop
+        if self.request.user.is_authenticated:
+            messages.warning(self.request, 'You are already logged in. Please log out first before trying to log in as an institution.')
+            return redirect('admission:home')
+        return super().dispatch(request, *args, **kwargs)
     
     def form_valid(self, form):
         user = form.get_user()

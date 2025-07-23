@@ -11,6 +11,7 @@ urlpatterns = [
     path('system-admin/institutions/', views.InstitutionListView.as_view(), name='institution_list'),
     path('system-admin/counseling/', views.CounselingManagementView.as_view(), name='counseling_management'),
     path('system-admin/generate-scores/', views.GenerateScoresView.as_view(), name='generate_scores'),
+    path('system-admin/remove-scores/', views.RemoveCETScoresView.as_view(), name='remove_scores'),
     path('system-admin/run-counseling/', views.RunCounselingView.as_view(), name='run_counseling'),
     path('system-admin/run-counseling-round/<int:round_number>/', views.RunSpecificRoundView.as_view(), name='run_specific_round'),
     path('system-admin/undo-counseling/<int:round_id>/', views.UndoCounselingView.as_view(), name='undo_counseling'),

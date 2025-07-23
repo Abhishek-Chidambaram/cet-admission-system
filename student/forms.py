@@ -26,36 +26,41 @@ class StudentProfileForm(forms.ModelForm):
                 field.widget.attrs.update({'class': 'form-control'})
 
 class ApplicationForm(forms.ModelForm):
-    course_preferences = forms.MultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple,
-        required=True,
-        help_text="Select your preferred courses in order of preference (maximum 5)"
-    )
-    
     class Meta:
         model = Application
         fields = ['course_preferences']
+        widgets = {
+            'course_preferences': forms.HiddenInput(),
+        }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # Get available courses from institutions
-        from institution.models import Course
-        course_choices = []
+        # Get available institutions and courses for dynamic selection
+        from institution.models import Institution, Course
         
-        courses = Course.objects.filter(is_active=True).select_related('institution').order_by('institution__name', 'course_name')
-        for course in courses:
-            choice_value = f"{course.institution.code}_{course.course_code}"
-            choice_label = f"{course.course_name} - {course.institution.name} ({course.institution.code})"
-            course_choices.append((choice_value, choice_label))
+        self.institutions = Institution.objects.filter(is_active=True).order_by('name')
+        self.courses_by_institution = {}
         
-        self.fields['course_preferences'].choices = course_choices
-        
-        if self.instance and self.instance.course_preferences:
-            self.fields['course_preferences'].initial = self.instance.course_preferences
+        for institution in self.institutions:
+            courses = Course.objects.filter(
+                institution=institution, 
+                is_active=True
+            ).order_by('course_name')
+            self.courses_by_institution[institution.id] = [
+                (f"{institution.code}_{course.course_code}", course.course_name) 
+                for course in courses
+            ]
     
     def clean_course_preferences(self):
-        preferences = self.cleaned_data['course_preferences']
+        preferences = self.cleaned_data.get('course_preferences', [])
+        if isinstance(preferences, str):
+            import json
+            try:
+                preferences = json.loads(preferences)
+            except:
+                preferences = []
+        
         if len(preferences) > 5:
             raise forms.ValidationError("You can select maximum 5 course preferences.")
         if len(preferences) == 0:
