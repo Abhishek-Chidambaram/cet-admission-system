@@ -2,7 +2,7 @@
 
 A comprehensive, bug-free web-based admission system for Karnataka Common Entrance Test (CET) engineering admissions, built with Django. This system replicates the real CET admission process with three dedicated modules and intelligent workflows.
 
-## 📋 Table of Contents
+## Table of Contents
 - [Features](#features)
 - [System Architecture](#system-architecture)
 - [Recent Updates](#recent-updates)
@@ -14,20 +14,20 @@ A comprehensive, bug-free web-based admission system for Karnataka Common Entran
 - [Contributing](#contributing)
 - [License](#license)
 
-## ✨ Features
+## Features
 
-### 🎯 **Three Core Modules**
+### **Three Core Modules**
 - **Student Module**: Complete admission journey from registration to seat acceptance
 - **Institution Module**: Course management, student tracking, and seat matrix monitoring
 - **Admin Module**: System administration, score generation, and counseling management
 
-### 🔐 **Advanced Authentication System**
+###  **Advanced Authentication System**
 - **Separate Login Portals**: Dedicated login pages for each user type
 - **Flexible Login**: Username OR Email authentication
 - **Role-Based Access**: Secure access control with proper error handling
 - **Session Management**: Secure user sessions with automatic redirects
 
-### 📚 **Student Features**
+###  **Student Features**
 - ✅ **Progressive Profile Creation**: Optional fields for gradual completion
 - ✅ **Smart Course Selection**: Up to 5 preferences with institution details
 - ✅ **AI Document Verification**: 90% success rate with detailed feedback
@@ -35,27 +35,27 @@ A comprehensive, bug-free web-based admission system for Karnataka Common Entran
 - ✅ **Intelligent Counseling**: Preference-based seat allocation
 - ✅ **Seat Management**: Accept/reject allotted seats with status tracking
 
-### 🏛️ **Institution Features**
+### **Institution Features**
 - ✅ **Course Portfolio Management**: Complete course and seat management
 - ✅ **Student Analytics**: Admitted student tracking with contact details
 - ✅ **Dynamic Seat Matrix**: Real-time occupancy monitoring
 - ✅ **Performance Metrics**: Occupancy rates and admission statistics
 - ✅ **Communication Hub**: Direct access to student information
 
-### ⚙️ **Admin Features**
+###  **Admin Features**
 - ✅ **System Dashboard**: Comprehensive overview with key metrics
 - ✅ **Score Generation Engine**: Realistic CET score and rank algorithms
 - ✅ **Counseling Automation**: Intelligent seat allocation based on preferences
 - ✅ **Institution Monitoring**: Complete oversight of participating institutions
 - ✅ **Advanced Analytics**: Detailed reports and system insights
 
-### 🤖 **Mock Features (Production-Ready for Education)**
+###  **Mock Features (Production-Ready for Education)**
 - **AI Document Verification**: Advanced simulation with confidence scoring
 - **Payment Gateway**: Complete mock payment processing
 - **Notification System**: Email/SMS simulation with realistic responses
 - **Score Algorithms**: Sophisticated ranking and percentile calculations
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -90,9 +90,9 @@ A comprehensive, bug-free web-based admission system for Karnataka Common Entran
                     └─────────────────┘
 ```
 
-## 🆕 Recent Updates
+##  Recent Updates
 
-### 🐛 **Major Bug Fixes (Latest Release)**
+###  **Major Bug Fixes (Latest Release)**
 - **✅ Profile Creation**: Fixed required field issues - all fields now optional for gradual completion
 - **✅ Application Workflow**: Automated verification process when documents are approved
 - **✅ Document Management**: Prevented duplicate uploads with clear error messages
@@ -101,13 +101,13 @@ A comprehensive, bug-free web-based admission system for Karnataka Common Entran
 - **✅ Data Integrity**: Fixed category rank generation and score calculations
 - **✅ User Experience**: Smooth workflows with intelligent error recovery
 
-### 🔧 **System Improvements**
+###  **System Improvements**
 - **Database Migration**: Seamless field updates without data loss
 - **Form Validation**: Enhanced validation with user-friendly error messages
 - **Workflow Automation**: Automatic status updates throughout the admission process
 - **Testing Framework**: Comprehensive system testing with automated verification
 
-## 🚀 Installation
+##  Installation
 
 ### Prerequisites
 - Python 3.8+ (Recommended: Python 3.10+)
@@ -155,9 +155,9 @@ python manage.py runserver
 
 Visit `http://127.0.0.1:8000/` to access the application.
 
-## 📖 Usage
+##  Usage
 
-### 🎯 **Access Points & Login Portals**
+###  **Access Points & Login Portals**
 
 | User Type | Login URL | Dashboard | Features |
 |-----------|-----------|-----------|----------|
@@ -166,17 +166,17 @@ Visit `http://127.0.0.1:8000/` to access the application.
 | **Admin** | `/auth/admin/login/` | `/admission/admin/dashboard/` | System Management, Counseling |
 | **All Options** | `/auth/login/` | - | Unified login selection page |
 
-### 🔑 **Demo Credentials (Username OR Email)**
+###  **Demo Credentials (Username OR Email)**
 
 | Role | Username | Email | Password | Access Level |
 |------|----------|-------|----------|--------------|
 | **Student** | `student1` | `student1@example.com` | `student123` | Student Portal |
-| **Admin** | `admin` | `admin@cet.edu` | `admin123` | Full System Access |
+| **Admin** | `admin` | `admin@kcet.edu` | `abhi@123` | Full System Access |
 | **Institution** | `rvce_admin` | `admin@rvce.edu` | `admin123` | RVCE Management |
 | **Institution** | `bmsce_admin` | `admin@bmsce.edu` | `admin123` | BMSCE Management |
 | **Institution** | `pesu_admin` | `admin@pesu.edu` | `admin123` | PESU Management |
 
-### 📱 **Complete Student Journey**
+###  **Complete Student Journey**
 1. **Registration** → Create account with email/phone verification
 2. **Profile Setup** → Complete personal, academic, and family details
 3. **Document Upload** → Upload and verify required certificates
@@ -185,21 +185,21 @@ Visit `http://127.0.0.1:8000/` to access the application.
 6. **Counseling** → Participate in automated seat allocation
 7. **Seat Acceptance** → Accept or reject allotted seats
 
-### 🏛️ **Institution Management Workflow**
+###  **Institution Management Workflow**
 1. **Dashboard Overview** → Monitor admissions and occupancy
 2. **Course Management** → View offered courses and seat distribution
 3. **Student Tracking** → Access admitted student details
 4. **Seat Matrix Analysis** → Real-time seat availability monitoring
 5. **Communication** → Direct access to student contact information
 
-### ⚙️ **Admin Control Panel**
+###  **Admin Control Panel**
 1. **System Monitoring** → Overview of all applications and institutions
 2. **Score Generation** → Create realistic CET scores for students
 3. **Counseling Execution** → Run automated seat allocation rounds
 4. **Analytics & Reports** → Comprehensive system insights
 5. **User Management** → Monitor and manage all system users
 
-## 🛠️ Management Commands
+##  Management Commands
 
 ```bash
 # System Setup
@@ -221,7 +221,7 @@ python manage.py migrate                       # Apply migrations
 python manage.py showmigrations                # Show migration status
 ```
 
-## 🎨 Available Engineering Courses
+##  Available Engineering Courses
 
 ### **Core Engineering Disciplines**
 - **CSE** - Computer Science Engineering
@@ -237,7 +237,7 @@ python manage.py showmigrations                # Show migration status
 - **AERO** - Aeronautical Engineering
 - **AUTO** - Automobile Engineering
 
-## 🏫 Participating Demo Institutions
+##  Participating Demo Institutions
 
 | Code | Institution Name | Type | Location | Courses |
 |------|------------------|------|----------|---------|
@@ -247,7 +247,7 @@ python manage.py showmigrations                # Show migration status
 | **UOM** | University of Mysore | Government | Mysore | All 10 Courses |
 | **NIET** | NIE Institute of Technology | Government | Mysore | All 10 Courses |
 
-## 🧪 Testing
+##  Testing
 
 ### **Automated System Testing**
 ```bash
@@ -255,13 +255,13 @@ python manage.py showmigrations                # Show migration status
 python manage.py test_system
 
 # Expected Output:
-# 🧪 Testing CET Admission System...
-# ✅ Student profile creation test passed
-# ✅ Application process test passed  
-# ✅ Document verification test passed
-# ✅ CET score generation test passed
-# ✅ Counseling process test passed
-# ✅ All tests completed successfully!
+#  Testing CET Admission System...
+#  Student profile creation test passed
+# Application process test passed  
+#  Document verification test passed
+#  CET score generation test passed
+#  Counseling process test passed
+#  All tests completed successfully!
 ```
 
 ### **Unit Testing**
@@ -286,7 +286,7 @@ python manage.py test admission.tests
 - [ ] Institution dashboard and student management
 - [ ] Admin score generation and counseling execution
 
-## 📊 API Documentation
+##  API Documentation
 
 ### **REST API Endpoints**
 ```
@@ -357,7 +357,7 @@ python manage.py collectstatic
 gunicorn cet_admission_system.wsgi:application
 ```
 
-## 📁 Detailed Project Structure
+##  Detailed Project Structure
 
 ```
 cet_admission_system/
@@ -404,7 +404,7 @@ cet_admission_system/
 └── 📄 .gitignore                   # Git ignore rules
 ```
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Here's how to get started:
 
@@ -434,11 +434,11 @@ git push origin feature/amazing-feature
 - Ensure all tests pass before submitting PR
 - Use meaningful commit messages
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🎯 Educational Value
+## Educational Value
 
 This system demonstrates advanced concepts in:
 
@@ -463,7 +463,7 @@ This system demonstrates advanced concepts in:
 - Progressive enhancement
 - Cross-browser compatibility
 
-## 🚀 Performance & Scalability
+## Performance & Scalability
 
 - **Database Optimization**: Efficient queries with select_related and prefetch_related
 - **Caching Strategy**: Built-in Django caching for improved performance
@@ -471,13 +471,13 @@ This system demonstrates advanced concepts in:
 - **API Rate Limiting**: Token-based authentication with proper throttling
 - **Scalable Architecture**: Modular design supporting horizontal scaling
 
-## 📞 Support & Community
+## Support & Community
 
 ### **Getting Help**
-- 📧 **Issues**: Create detailed GitHub issues for bugs or feature requests
-- 📖 **Documentation**: Comprehensive inline documentation and comments
-- 🧪 **Testing**: Use `python manage.py test_system` to verify functionality
-- 💬 **Discussions**: GitHub Discussions for questions and ideas
+-  **Issues**: Create detailed GitHub issues for bugs or feature requests
+-  **Documentation**: Comprehensive inline documentation and comments
+-  **Testing**: Use `python manage.py test_system` to verify functionality
+-  **Discussions**: GitHub Discussions for questions and ideas
 
 ### **Quick Troubleshooting**
 ```bash
@@ -488,7 +488,7 @@ python manage.py collectstatic        # Fix static file issues
 python manage.py setup_demo_data      # Reset demo data
 ```
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - **Django Community**: For the robust web framework
 - **Bootstrap Team**: For responsive UI components
@@ -498,15 +498,4 @@ python manage.py setup_demo_data      # Reset demo data
 
 ---
 
-## 🌟 Project Highlights
-
-- **🐛 Bug-Free**: Comprehensive testing and bug fixes applied
-- **🔒 Secure**: Role-based authentication with proper access control
-- **📱 Responsive**: Mobile-friendly design with Bootstrap
-- **🚀 Production-Ready**: Optimized for deployment and scaling
-- **📚 Educational**: Perfect for learning Django and web development
-- **🎯 Realistic**: Mirrors actual CET admission processes
-
 **⭐ If this project helps you learn or build something amazing, please give it a star!**
-
-**Made with ❤️ for education and learning**
