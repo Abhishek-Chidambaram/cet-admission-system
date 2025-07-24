@@ -5,9 +5,6 @@ What’s wrong: The system doesn’t check whether the course or institution a s
 Why it’s a problem: Students can end up selecting course options that no longer exist. This leads to issues during the counseling rounds when the system tries to allocate those non-existent preferences.
 Code Snippet:
 
-python
-Copy
-Edit
 current_prefs = [
     pref for pref in self.object.course_preferences 
     if pref and isinstance(pref, str) and '_' in pref and len(pref) > 3
@@ -38,9 +35,6 @@ What’s wrong: When multiple students have the exact same CET rank, the algorit
 Why it’s a problem: Seat allocation becomes unpredictable and inconsistent between runs.
 Code Snippet:
 
-python
-Copy
-Edit
 eligible_students = StudentProfile.objects.filter(
     cet_score__isnull=False
 ).order_by('cet_score__overall_rank')
@@ -58,9 +52,6 @@ What’s wrong: The logic uses student.category or 'GENERAL', which works fine u
 Why it’s a problem: An empty string isn’t None, so it bypasses the fallback and students might miss out on proper category-based seat allocation.
 Code Snippet:
 
-python
-Copy
-Edit
 student_category = student.category or 'GENERAL'
 Steps to see the bug:
 
@@ -70,7 +61,7 @@ Run a counseling round.
 
 The system won't treat them as GENERAL — they’ll be skipped from category-based rules.
 
-Planned Fixes
+How we are planning to Fix it:
 Course Preference Validation: Add a check to ensure selected courses still exist in the database before submission.
 
 File Upload Limit: Introduce a max file size limit (e.g., 2MB or 5MB) to prevent oversized uploads.
@@ -79,7 +70,4 @@ Tie-Breaker Logic: Add a secondary sort — like application submission time or 
 
 Category Fix: Improve the fallback logic to correctly handle empty strings using:
 
-python
-Copy
-Edit
 student.category if student.category else 'GENERAL'
