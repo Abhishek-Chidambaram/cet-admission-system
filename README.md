@@ -1,6 +1,6 @@
 # CET Admission System
 
-A comprehensive, bug-free web-based admission system for Karnataka Common Entrance Test (CET) engineering admissions, built with Django. This system replicates the real CET admission process with three dedicated modules and intelligent workflows.
+A seamless, web-based admission portal for Karnataka CET engineering admissions, expertly built with Django. This robust system mirrors the actual CET process, featuring three specialized modules and smart, automated workflows to deliver a smooth, error-free admission experience.
 
 ## Table of Contents
 - [Features](#features)
@@ -470,7 +470,7 @@ This system demonstrates advanced concepts in:
 ### **Getting Help**
 -  **Issues**: Create detailed GitHub issues for bugs or feature requests
 -  **Documentation**: Comprehensive inline documentation and comments
--  **Testing**: Use `python manage.py test_system` to verify functionality
+-  **Testing**: Use python manage.py test_system to verify functionality
 -  **Discussions**: GitHub Discussions for questions and ideas
 
 ### **Quick Troubleshooting**
