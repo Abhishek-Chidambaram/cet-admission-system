@@ -1,4 +1,4 @@
-# Known Bugs in CET Admission System
+# Known Bugs in our CET Admission System
 
 ## Bug #1: Course Preference Validation Issue
 **Location**: student/views.py (ApplicationView.get_context_data())
@@ -15,7 +15,7 @@ current_prefs = [
 ]
 ```
 
-**How to Reproduce**: 
+**Steps to reproduce the Bug**: 
 1. Add a course preference
 2. Delete that course from admin panel
 3. The preference will still show in student's list but won't work during counseling
@@ -27,7 +27,7 @@ current_prefs = [
 
 **Impact**: Users could upload very large files, potentially consuming excessive server storage and causing performance issues.
 
-**How to Reproduce**: 
+**Steps to reproduce the Bug**: 
 1. Try uploading a very large file (>10MB)
 2. System will accept it without any size restrictions
 
@@ -45,7 +45,7 @@ eligible_students = StudentProfile.objects.filter(
 ).order_by('cet_score__overall_rank')
 ```
 
-**How to Reproduce**: 
+**Steps to reproduce the Bug**: 
 1. Create multiple students with identical CET ranks
 2. Run counseling round
 3. The allocation order might be inconsistent between runs
@@ -64,11 +64,11 @@ student_category = student.category or 'GENERAL'
 
 **Problem**: Empty string "" would still be truthy, but None would default to 'GENERAL'
 
-**How to Reproduce**: 
+**Steps to reproduce the Bug**: 
 1. Set a student's category to empty string ""
 2. Run counseling - the student won't get GENERAL category treatment
 
-## Suggested Fixes:
+## How we are planning to Fix it:
 1. **Course Validation**: Add real-time validation to check if selected courses still exist in database
 2. **File Size Limit**: Implement MAX_UPLOAD_SIZE validation in document upload
 3. **Tie-breaking**: Add secondary sorting criteria like application submission time or student ID
