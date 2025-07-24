@@ -166,8 +166,6 @@ class DocumentUploadView(StudentRequiredMixin, TemplateView):
 
 class VerifyDocumentView(StudentRequiredMixin, TemplateView):
     def post(self, request, doc_id):
-        # This view is no longer needed as verification is done by admin
-        # Redirect to documents page with info message
         messages.info(request, 'Document verification is now handled by administrators. Your documents will be reviewed shortly.')
         return redirect('student:documents')
 
@@ -305,7 +303,7 @@ class AdmissionOrderView(StudentRequiredMixin, TemplateView):
         
         return context
 
-# Keep legacy view for backward compatibility
+
 class AcceptSeatView(StudentRequiredMixin, TemplateView):
     def get(self, request, allotment_id):
         return redirect('student:choice_selection', allotment_id=allotment_id)
