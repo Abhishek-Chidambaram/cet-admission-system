@@ -87,13 +87,13 @@ A comprehensive, bug-free web-based admission system for Karnataka Common Entran
 ##  Recent Updates
 
 ###  **Major Bug Fixes (Latest Release)**
-- ** Profile Creation**: Fixed required field issues - all fields now optional for gradual completion
-- ** Application Workflow**: Automated verification process when documents are approved
-- ** Document Management**: Prevented duplicate uploads with clear error messages
-- ** Counseling Logic**: Implemented preference-based seat allocation algorithm
-- ** Access Control**: Enhanced security with proper error handling and redirects
-- ** Data Integrity**: Fixed category rank generation and score calculations
-- ** User Experience**: Smooth workflows with intelligent error recovery
+- **Profile Creation**: Fixed required field issues - all fields now optional for gradual completion
+- **Application Workflow**: Automated verification process when documents are approved
+- **Document Management**: Prevented duplicate uploads with clear error messages
+- **Counseling Logic**: Implemented preference-based seat allocation algorithm
+- **Access Control**: Enhanced security with proper error handling and redirects
+- **Data Integrity**: Fixed category rank generation and score calculations
+- **User Experience**: Smooth workflows with intelligent error recovery
 
 ###  **System Improvements**
 - **Database Migration**: Seamless field updates without data loss
