@@ -5,8 +5,7 @@
 
 **Description**: The system doesn't properly validate if selected course preferences are still available or if the institution/course combination exists in the database.
 
-**Impact**: Students can select course preferences that may no longer be valid, leading to issues during counseling rounds.
-
+**Impact**: Students may select course preferences that are no longer valid, potentially causing complications during the counseling process.
 **Code Reference**: 
 ```python
 current_prefs = [
